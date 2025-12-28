@@ -3,10 +3,32 @@ import React from 'react';
 import { Mail, MapPin, Send, Github, Linkedin, Instagram, User } from 'lucide-react';
 
 export const Contact: React.FC = () => {
+  const [showModal, setShowModal] = React.useState(false);
+  const [formData, setFormData] = React.useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, integrate with an email service
-    alert("Message sent! (Simulation)");
+    const form = e.target as HTMLFormElement;
+    setFormData({
+      name: (form.elements[0] as HTMLInputElement).value,
+      email: (form.elements[1] as HTMLInputElement).value,
+      subject: (form.elements[2] as HTMLInputElement).value,
+      message: (form.elements[3] as HTMLTextAreaElement).value
+    });
+    setShowModal(true);
+  };
+
+  const confirmSend = () => {
+    const { name, email, subject, message } = formData;
+    const body = `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`;
+    const mailtoLink = `mailto:derocton@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoLink;
+    setShowModal(false);
   };
 
   return (
@@ -113,6 +135,41 @@ export const Contact: React.FC = () => {
               Send Message <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
             </button>
           </form>
+
+          {/* Custom Confirmation Modal */}
+          {showModal && (
+            <div className="absolute inset-0 z-50 flex items-center justify-center p-4">
+              <div 
+                className="absolute inset-0 bg-slate-900/80 backdrop-blur-md"
+                onClick={() => setShowModal(false)}
+              ></div>
+              <div className="relative w-full max-w-sm bg-[#0f172a] border border-white/10 p-6 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 rounded-full bg-cyan-500/10 flex items-center justify-center mb-4">
+                    <Send className="w-6 h-6 text-cyan-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Open Email Client?</h3>
+                  <p className="text-slate-400 text-sm mb-6">
+                    This will open your default email app with the message pre-filled. Just hit send!
+                  </p>
+                  <div className="flex gap-3 w-full">
+                    <button
+                      onClick={() => setShowModal(false)}
+                      className="flex-1 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-slate-300 font-medium transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={confirmSend}
+                      className="flex-1 px-4 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-white font-medium rounded-xl shadow-lg shadow-cyan-500/20 transition-all"
+                    >
+                      Open Email
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
