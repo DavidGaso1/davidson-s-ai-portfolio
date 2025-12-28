@@ -18,6 +18,21 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
+      },
+      build: {
+        outDir: 'dist',
+        sourcemap: false,
+        minify: 'esbuild',
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              'react-vendor': ['react', 'react-dom'],
+              'ui-vendor': ['lucide-react', 'recharts'],
+              'ai-vendor': ['@google/generative-ai']
+            }
+          }
+        },
+        chunkSizeWarningLimit: 1000
       }
     };
 });
