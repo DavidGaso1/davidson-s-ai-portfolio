@@ -18,7 +18,7 @@ export const About: React.FC = () => {
           <div className="aspect-square rounded-3xl overflow-hidden relative z-10 border-2 border-white/10">
             <img 
               src="/profile.jpg" 
-              alt="Davidson Chiemezuo" 
+              alt="Davidson Ahuruezenma" 
               className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-105 hover:scale-100" 
             />
           </div>
