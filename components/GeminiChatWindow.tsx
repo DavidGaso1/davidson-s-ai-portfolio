@@ -84,6 +84,21 @@ export const GeminiChatWindow: React.FC = () => {
   const [hasStarted, setHasStarted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Inactivity Timer State
+  const [lastActivityTime, setLastActivityTime] = useState(Date.now());
+  const [showInactivityWarning, setShowInactivityWarning] = useState(false);
+  const [inactivityCountdown, setInactivityCountdown] = useState(60); // 60 seconds to cancel
+  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const resetInactivityTimer = () => {
+    setLastActivityTime(Date.now());
+    if (showInactivityWarning) {
+      setShowInactivityWarning(false);
+      setInactivityCountdown(60);
+    }
+  };
+
   // Load chat from localStorage on mount
   useEffect(() => {
     try {
@@ -110,6 +125,41 @@ export const GeminiChatWindow: React.FC = () => {
       }
     }
   }, [messages]);
+
+  // Inactivity Monitor Logic
+  useEffect(() => {
+    if (!hasStarted || messages.length === 0 || showInactivityWarning) return;
+
+    const checkInactivity = () => {
+      const idleTime = Date.now() - lastActivityTime;
+      const fiveMinutes = 5 * 60 * 1000;
+
+      if (idleTime >= fiveMinutes) {
+        setShowInactivityWarning(true);
+      }
+    };
+
+    const interval = setInterval(checkInactivity, 10000); // Check every 10s
+    return () => clearInterval(interval);
+  }, [lastActivityTime, hasStarted, messages.length, showInactivityWarning]);
+
+  // Warning Countdown Logic
+  useEffect(() => {
+    if (showInactivityWarning) {
+      if (inactivityCountdown <= 0) {
+        confirmClear();
+        return;
+      }
+
+      countdownTimerRef.current = setTimeout(() => {
+        setInactivityCountdown(prev => prev - 1);
+      }, 1000);
+
+      return () => {
+        if (countdownTimerRef.current) clearTimeout(countdownTimerRef.current);
+      };
+    }
+  }, [showInactivityWarning, inactivityCountdown]);
 
   // Format markdown-style text to HTML
   const formatMessage = (text: string) => {
@@ -176,6 +226,7 @@ export const GeminiChatWindow: React.FC = () => {
   };
 
   const handleSend = async (messageOverride?: string) => {
+    resetInactivityTimer();
     const messageToSend = messageOverride || input.trim();
     if (!messageToSend) return;
 
@@ -342,7 +393,10 @@ export const GeminiChatWindow: React.FC = () => {
               <input
                 type="text"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  resetInactivityTimer();
+                }}
                 onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSend()}
                 placeholder="Ask me about Davidson's work..."
                 disabled={isLoading}
@@ -405,6 +459,33 @@ export const GeminiChatWindow: React.FC = () => {
                   Clear & Save
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Inactivity Warning Modal */}
+      {showInactivityWarning && (
+        <div className="absolute inset-0 z-[60] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-slate-950/80 backdrop-blur-md rounded-3xl"
+          ></div>
+          <div className="relative w-full max-w-sm bg-[#0f172a] border border-cyan-500/30 p-8 rounded-3xl shadow-[0_0_50px_-12px_rgba(6,182,212,0.5)] animate-in zoom-in-95 duration-300">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-cyan-500/10 flex items-center justify-center mb-6 animate-pulse">
+                <Bot className="w-8 h-8 text-cyan-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-3">Still there?</h3>
+              <p className="text-slate-400 text-sm mb-8 leading-relaxed">
+                I'll be clearing our chat in <span className="text-cyan-400 font-mono font-bold">{inactivityCountdown}s</span> to save space. Davidson will still receive a copy of our talk!
+              </p>
+              
+              <button
+                onClick={resetInactivityTimer}
+                className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-2xl shadow-lg shadow-cyan-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Stay Connected
+              </button>
             </div>
           </div>
         </div>
