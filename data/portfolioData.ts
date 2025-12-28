@@ -1,7 +1,7 @@
 
 export const PERSONAL_INFO = {
-  name: "Ahuruezenma Davidson",
-  phone: "+2348123456789", // Placeholder for WhatsApp
+  name: "Ahuruezenma Davidson Chiemezuo",
+  phone: "+2349061505041",
   roles: ["AI Developer", "Automation Specialist", "Data Protection Officer"],
   location: "Abuja, Nigeria",
   email: "derocton@gmail.com",
