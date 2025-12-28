@@ -6,7 +6,7 @@ import {
   experiences, projects, certifications 
 } from '../data/portfolioData';
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 // Dynamically generated Portfolio Knowledge Base
 const PORTFOLIO_KNOWLEDGE = `

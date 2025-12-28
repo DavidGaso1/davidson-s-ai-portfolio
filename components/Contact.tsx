@@ -1,34 +1,35 @@
 
-import React from 'react';
-import { Mail, MapPin, Send, Github, Linkedin, Instagram, User } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Mail, MapPin, Send, Github, Linkedin, User, Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 
 export const Contact: React.FC = () => {
-  const [showModal, setShowModal] = React.useState(false);
-  const [formData, setFormData] = React.useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
+  const form = useRef<HTMLFormElement>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const form = e.target as HTMLFormElement;
-    setFormData({
-      name: (form.elements[0] as HTMLInputElement).value,
-      email: (form.elements[1] as HTMLInputElement).value,
-      subject: (form.elements[2] as HTMLInputElement).value,
-      message: (form.elements[3] as HTMLTextAreaElement).value
-    });
-    setShowModal(true);
-  };
+    setIsSending(true);
 
-  const confirmSend = () => {
-    const { name, email, subject, message } = formData;
-    const body = `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`;
-    const mailtoLink = `mailto:derocton@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoLink;
-    setShowModal(false);
+    // Environment variables in Vite must start with VITE_
+    emailjs.sendForm(
+      import.meta.env.VITE_EMAILJS_SERVICE_ID, 
+      import.meta.env.VITE_EMAILJS_TEMPLATE_ID, 
+      form.current!, 
+      import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+    )
+      .then((result) => {
+        setSubmitStatus('success');
+        setShowModal(true);
+        setIsSending(false);
+        form.current?.reset();
+      }, (error) => {
+        setSubmitStatus('error');
+        setShowModal(true);
+        setIsSending(false);
+      });
   };
 
   return (
@@ -86,12 +87,13 @@ export const Contact: React.FC = () => {
           {/* Decorative mesh inside the card */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl" />
           
-          <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+          <form ref={form} onSubmit={handleSubmit} className="space-y-6 relative z-10">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-gray-300 ml-1">Full Name</label>
                 <input 
                   type="text" 
+                  name="user_name"
                   required
                   placeholder="John Doe" 
                   className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:border-cyan-500 transition-all text-white placeholder:text-gray-600"
@@ -101,6 +103,7 @@ export const Contact: React.FC = () => {
                 <label className="text-sm font-semibold text-gray-300 ml-1">Email Address</label>
                 <input 
                   type="email" 
+                  name="user_email"
                   required
                   placeholder="john@example.com" 
                   className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:border-cyan-500 transition-all text-white placeholder:text-gray-600"
@@ -112,6 +115,7 @@ export const Contact: React.FC = () => {
               <label className="text-sm font-semibold text-gray-300 ml-1">Subject</label>
               <input 
                 type="text" 
+                name="subject"
                 required
                 placeholder="Collaboration Opportunity" 
                 className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:border-cyan-500 transition-all text-white placeholder:text-gray-600"
@@ -121,6 +125,7 @@ export const Contact: React.FC = () => {
             <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-300 ml-1">Message</label>
               <textarea 
+                name="message"
                 rows={5} 
                 required
                 placeholder="Hello Davidson, I'm interested in..." 
@@ -130,13 +135,18 @@ export const Contact: React.FC = () => {
 
             <button 
               type="submit" 
-              className="w-full py-5 bg-cyan-500 text-white font-bold rounded-2xl hover:bg-cyan-400 transition-all flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/20 group"
+              disabled={isSending}
+              className="w-full py-5 bg-cyan-500 text-white font-bold rounded-2xl hover:bg-cyan-400 transition-all flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/20 group disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Send Message <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              {isSending ? (
+                <>Sending... <Loader2 className="w-5 h-5 animate-spin" /></>
+              ) : (
+                <>Send Message <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /></>
+              )}
             </button>
           </form>
 
-          {/* Custom Confirmation Modal */}
+          {/* Custom Success/Error Modal */}
           {showModal && (
             <div className="absolute inset-0 z-50 flex items-center justify-center p-4">
               <div 
@@ -145,27 +155,35 @@ export const Contact: React.FC = () => {
               ></div>
               <div className="relative w-full max-w-sm bg-[#0f172a] border border-white/10 p-6 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200">
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-12 h-12 rounded-full bg-cyan-500/10 flex items-center justify-center mb-4">
-                    <Send className="w-6 h-6 text-cyan-400" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Open Email Client?</h3>
-                  <p className="text-slate-400 text-sm mb-6">
-                    This will open your default email app with the message pre-filled. Just hit send!
-                  </p>
-                  <div className="flex gap-3 w-full">
-                    <button
-                      onClick={() => setShowModal(false)}
-                      className="flex-1 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-slate-300 font-medium transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={confirmSend}
-                      className="flex-1 px-4 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-white font-medium rounded-xl shadow-lg shadow-cyan-500/20 transition-all"
-                    >
-                      Open Email
-                    </button>
-                  </div>
+                  
+                  {submitStatus === 'success' ? (
+                    <>
+                      <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mb-4">
+                        <CheckCircle2 className="w-6 h-6 text-green-500" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-2">Message Sent!</h3>
+                      <p className="text-slate-400 text-sm mb-6">
+                        Thanks for reaching out! Davidson will get back to you as soon as possible.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
+                        <XCircle className="w-6 h-6 text-red-500" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-2">Failed to Send</h3>
+                      <p className="text-slate-400 text-sm mb-6">
+                        Something went wrong. Please check your credentials or try emailing directly.
+                      </p>
+                    </>
+                  )}
+
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="w-full px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-slate-300 font-medium transition-colors"
+                  >
+                    Close
+                  </button>
                 </div>
               </div>
             </div>
