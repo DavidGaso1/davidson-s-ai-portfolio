@@ -1,35 +1,24 @@
-
 import React, { useRef, useState } from 'react';
-import { Mail, MapPin, Send, Github, Linkedin, User, Loader2, CheckCircle2, XCircle } from 'lucide-react';
-import emailjs from '@emailjs/browser';
+import { Mail, MapPin, Send, Github, Linkedin, User, MessageCircle } from 'lucide-react';
+import { PERSONAL_INFO } from '../data/portfolioData';
 
 export const Contact: React.FC = () => {
   const form = useRef<HTMLFormElement>(null);
   const [showModal, setShowModal] = useState(false);
-  const [isSending, setIsSending] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSending(true);
+    const formData = new FormData(form.current!);
+    const name = formData.get('user_name') as string;
+    const subject = formData.get('subject') as string;
+    const message = formData.get('message') as string;
 
-    // Environment variables in Vite must start with VITE_
-    emailjs.sendForm(
-      import.meta.env.VITE_EMAILJS_SERVICE_ID, 
-      import.meta.env.VITE_EMAILJS_TEMPLATE_ID, 
-      form.current!, 
-      import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-    )
-      .then((result) => {
-        setSubmitStatus('success');
-        setShowModal(true);
-        setIsSending(false);
-        form.current?.reset();
-      }, (error) => {
-        setSubmitStatus('error');
-        setShowModal(true);
-        setIsSending(false);
-      });
+    const text = `*New Portfolio Message*\n\n*From:* ${name}\n*Subject:* ${subject}\n*Message:* ${message}`;
+    const whatsappUrl = `https://wa.me/${PERSONAL_INFO.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`;
+    
+    window.open(whatsappUrl, '_blank');
+    setShowModal(true);
+    form.current?.reset();
   };
 
   return (
@@ -66,8 +55,9 @@ export const Contact: React.FC = () => {
 
           <div className="flex gap-4">
             {[
-              { Icon: Github, href: "https://github.com/DavidGaso1" },
-              { Icon: Linkedin, href: "https://linkedin.com/in/davidson-ahuruezenma-33a773294" },
+              { Icon: Github, href: PERSONAL_INFO.github },
+              { Icon: Linkedin, href: PERSONAL_INFO.linkedin },
+              { Icon: MessageCircle, href: `https://wa.me/${PERSONAL_INFO.phone.replace(/[^0-9]/g, '')}` },
               { Icon: User, href: "https://gravatar.com/profoundlyhopefuledea400b06.card" }
             ].map(({ Icon, href }, idx) => (
               <a 
@@ -135,18 +125,13 @@ export const Contact: React.FC = () => {
 
             <button 
               type="submit" 
-              disabled={isSending}
-              className="w-full py-5 bg-cyan-500 text-white font-bold rounded-2xl hover:bg-cyan-400 transition-all flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/20 group disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-5 bg-cyan-500 text-white font-bold rounded-2xl hover:bg-cyan-400 transition-all flex items-center justify-center gap-3 shadow-lg shadow-cyan-500/20 group hover:scale-[1.02] active:scale-[0.98]"
             >
-              {isSending ? (
-                <>Sending... <Loader2 className="w-5 h-5 animate-spin" /></>
-              ) : (
-                <>Send Message <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /></>
-              )}
+              Send WhatsApp Message <MessageCircle className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
             </button>
           </form>
 
-          {/* Custom Success/Error Modal */}
+          {/* WhatsApp Success Modal */}
           {showModal && (
             <div className="absolute inset-0 z-50 flex items-center justify-center p-4">
               <div 
@@ -155,29 +140,13 @@ export const Contact: React.FC = () => {
               ></div>
               <div className="relative w-full max-w-sm bg-[#0f172a] border border-white/10 p-6 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200">
                 <div className="flex flex-col items-center text-center">
-                  
-                  {submitStatus === 'success' ? (
-                    <>
-                      <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mb-4">
-                        <CheckCircle2 className="w-6 h-6 text-green-500" />
-                      </div>
-                      <h3 className="text-xl font-bold text-white mb-2">Message Sent!</h3>
-                      <p className="text-slate-400 text-sm mb-6">
-                        Thanks for reaching out! Davidson will get back to you as soon as possible.
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
-                        <XCircle className="w-6 h-6 text-red-500" />
-                      </div>
-                      <h3 className="text-xl font-bold text-white mb-2">Failed to Send</h3>
-                      <p className="text-slate-400 text-sm mb-6">
-                        Something went wrong. Please check your credentials or try emailing directly.
-                      </p>
-                    </>
-                  )}
-
+                  <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mb-4">
+                    <MessageCircle className="w-6 h-6 text-green-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Opening WhatsApp</h3>
+                  <p className="text-slate-400 text-sm mb-6">
+                    A WhatsApp tab should have opened. If not, please check your browser's popup blocker.
+                  </p>
                   <button
                     onClick={() => setShowModal(false)}
                     className="w-full px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-slate-300 font-medium transition-colors"
