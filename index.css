@@ -1,0 +1,164 @@
+/* Fusion Theme CSS */
+:root[data-theme='dark'] {
+  --bg-primary: #020617; /* Dark Slate/Black */
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --accent-cyan: #22d3ee;
+  --accent-purple: #c084fc;
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --card-border: rgba(255, 255, 255, 0.05);
+  --text-glow: 0 0 10px rgba(34, 211, 238, 0.5);
+  --particle-color: #22d3ee;
+}
+
+:root[data-theme='light'] {
+  --bg-primary: #f8fafc; /* Slate-50 */
+  --text-primary: #0f172a; /* Slate-900 */
+  --text-secondary: #475569; /* Slate-600 */
+  --accent-cyan: #0284c7; /* Sky-600 (Darker for contrast) */
+  --accent-purple: #7e22ce; /* Purple-700 */
+  --card-bg: rgba(255, 255, 255, 0.7);
+  --card-border: rgba(0, 0, 0, 0.05);
+  --text-glow: 0 0 5px rgba(2, 132, 199, 0.3);
+  --particle-color: #0369a1; /* Sky-700 */
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+/* --- Fusion Keyframes --- */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes float-delayed {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(0, 240, 255, 0.2); }
+  50% { box-shadow: 0 0 20px rgba(0, 240, 255, 0.6); }
+}
+
+@keyframes border-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes slide-up-fade {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes grid-move {
+  0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+  100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+}
+
+@keyframes orb-move {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+/* --- Utility Classes --- */
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 7s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s infinite;
+}
+
+.animate-slide-up {
+  opacity: 0;
+  animation: slide-up-fade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.fusion-text-glow {
+  text-shadow: var(--text-glow);
+}
+
+@keyframes scan {
+  from { transform: translateY(-100vh); }
+  to { transform: translateY(100vh); }
+}
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-30px); }
+}
+
+.animate-scan {
+  animation: scan 8s linear infinite;
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 10s ease-in-out infinite;
+}
+
+/* --- Fusion Components --- */
+
+.fusion-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.fusion-card:hover {
+  border-color: var(--accent-cyan);
+  background: var(--card-bg);
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+}
+
+.fusion-button {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+  color: #ffffff; /* Always white text on button */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  opacity: 0.9;
+}
+
+.fusion-button:hover {
+  opacity: 1;
+  box-shadow: 0 0 15px var(--accent-cyan);
+  transform: translateY(-2px);
+}
+
+.fusion-grid-bg {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background-image: 
+    linear-gradient(rgba(0, 240, 255, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.3) 1px, transparent 1px);
+  background-size: 50px 50px;
+  transform-origin: center;
+  animation: grid-move 20s linear infinite;
+  mask-image: radial-gradient(circle at center, black 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(circle at center, black 0%, transparent 70%);
+  pointer-events: none;
+}
