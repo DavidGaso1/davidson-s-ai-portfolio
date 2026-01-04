@@ -271,14 +271,14 @@ export const NduChatWindow: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-6 relative">
       {/* Tech-Savvy Header */}
-      <div className="text-center mb-16 relative">
+      <div className="text-center mb-10 relative">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-6 group cursor-default">
           <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.8)]"></div>
           <span className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-widest">Neural Core: Active</span>
         </div>
         
-        <h3 className="text-5xl md:text-7xl font-black mb-6 tracking-tighter">
-          PROJECT <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600">NDU-AI</span>
+        <h3 className="text-3xl md:text-5xl font-black mb-4 tracking-tighter">
+          PROJECT <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600">NDU-AI</span>
         </h3>
         
         <p className="text-slate-500 font-mono text-xs uppercase tracking-[0.3em] max-w-2xl mx-auto">
@@ -327,10 +327,10 @@ export const NduChatWindow: React.FC = () => {
           {!hasStarted ? (
             <div className="p-16 md:p-24 text-center relative overflow-hidden">
               <div className="relative z-10">
-                <div className="w-24 h-24 rounded-3xl bg-cyan-500/5 flex items-center justify-center mx-auto mb-10 border border-cyan-500/20 shadow-2xl transform hover:rotate-6 transition-all duration-500 group-welcome">
-                  <Bot className="w-12 h-12 text-cyan-400" />
+                <div className="w-16 h-16 rounded-2xl bg-cyan-500/5 flex items-center justify-center mx-auto mb-6 border border-cyan-500/20 shadow-xl transform hover:rotate-6 transition-all duration-500 group-welcome">
+                  <Bot className="w-8 h-8 text-cyan-500" />
                 </div>
-                <h4 className="text-3xl font-black mb-4 text-white uppercase tracking-tight">System Ready</h4>
+                <h4 className="text-xl font-black mb-2 text-slate-900 dark:text-white uppercase tracking-tight">System Ready</h4>
                 <p className="text-slate-400/70 mb-14 max-w-sm mx-auto font-mono text-xs uppercase tracking-widest leading-loose">
                   Select a prompt to begin neural synchronization
                 </p>
@@ -340,10 +340,10 @@ export const NduChatWindow: React.FC = () => {
                     <button
                       key={idx}
                       onClick={() => handleSend(q)}
-                      className="group p-6 bg-white/[0.01] hover:bg-cyan-500/5 border border-white/[0.05] hover:border-cyan-500/30 text-left rounded-[24px] transition-all duration-500 backdrop-blur-sm"
+                      className="group p-6 bg-slate-900/[0.03] hover:bg-cyan-500/10 border border-slate-900/5 hover:border-cyan-500/30 text-left rounded-[24px] transition-all duration-500 backdrop-blur-md shadow-sm"
                     >
-                      <div className="text-[10px] font-mono text-cyan-500/40 uppercase mb-3 tracking-widest">Protocol 0{idx+1}</div>
-                      <span className="text-sm font-bold text-slate-300 group-hover:text-white transition-colors">{q}</span>
+                      <div className="text-[10px] font-mono text-cyan-600 uppercase mb-3 tracking-widest font-bold">Protocol 0{idx+1}</div>
+                      <span className="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors">{q}</span>
                     </button>
                   ))}
                 </div>
@@ -366,8 +366,8 @@ export const NduChatWindow: React.FC = () => {
                 <div key={i} className={`flex gap-6 ${msg.role === 'user' ? 'flex-row-reverse' : ''} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
                   <div className="flex-shrink-0 mt-1">
                     {msg.role === 'bot' ? (
-                      <div className="w-12 h-12 rounded-2xl bg-white/[0.02] p-3 flex items-center justify-center border border-white/10 backdrop-blur-xl shadow-xl">
-                        <Bot className="w-8 h-8 text-cyan-400 relative z-10" />
+                      <div className="w-12 h-12 rounded-2xl bg-slate-900/5 dark:bg-white/[0.02] p-3 flex items-center justify-center border border-slate-900/10 dark:border-white/10 backdrop-blur-xl shadow-xl">
+                        <Bot className="w-8 h-8 text-cyan-600 dark:text-cyan-400 relative z-10" />
                       </div>
                     ) : (
                       <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-600 to-blue-700 flex items-center justify-center border border-white/20 shadow-xl">
@@ -378,8 +378,8 @@ export const NduChatWindow: React.FC = () => {
                   
                   <div className={`max-w-[80%] px-8 py-6 rounded-[32px] text-[15px] leading-relaxed shadow-sm transition-all backdrop-blur-md ${
                     msg.role === 'user' 
-                      ? 'bg-white/[0.04] text-white rounded-tr-sm border border-white/10' 
-                      : 'bg-white/[0.01] text-slate-200 border border-white/[0.03] rounded-tl-sm'
+                      ? 'bg-cyan-600/10 dark:bg-white/[0.04] text-slate-900 dark:text-white rounded-tr-sm border border-cyan-600/10 dark:border-white/10' 
+                      : 'bg-slate-900/[0.03] dark:bg-white/[0.01] text-slate-700 dark:text-slate-200 border border-slate-900/5 dark:border-white/[0.03] rounded-tl-sm'
                   }`}>
                     {msg.role === 'bot' ? (
                       <div dangerouslySetInnerHTML={{ __html: formatMessage(msg.text) }} className="markdown-content" />
@@ -392,10 +392,10 @@ export const NduChatWindow: React.FC = () => {
               
               {isLoading && (
                 <div className="flex gap-6 animate-in fade-in duration-300">
-                  <div className="w-12 h-12 rounded-2xl bg-white/[0.02] p-3 flex items-center justify-center border border-white/10 backdrop-blur-xl">
-                    <Loader2 className="w-5 h-5 text-cyan-400 animate-spin" />
+                  <div className="w-12 h-12 rounded-2xl bg-slate-900/5 dark:bg-white/[0.02] p-3 flex items-center justify-center border border-slate-900/5 dark:border-white/10 backdrop-blur-xl">
+                    <Loader2 className="w-5 h-5 text-cyan-600 dark:text-cyan-400 animate-spin" />
                   </div>
-                  <div className="bg-white/[0.01] border border-white/[0.05] px-7 py-5 rounded-[32px] rounded-tl-sm backdrop-blur-md">
+                  <div className="bg-slate-900/[0.03] dark:bg-white/[0.01] border border-slate-900/5 dark:border-white/[0.05] px-7 py-5 rounded-[32px] rounded-tl-sm backdrop-blur-md">
                     <div className="flex gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/40 animate-bounce" style={{ animationDelay: '0ms' }}></div>
                       <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/40 animate-bounce" style={{ animationDelay: '150ms' }}></div>
@@ -420,13 +420,13 @@ export const NduChatWindow: React.FC = () => {
                 onKeyPress={(e) => e.key === 'Enter' && !isLoading && !isInitializing && handleSend()}
                 placeholder={isInitializing ? "TERMINAL_BUSY ..." : "EXECUTE_QUERY_ ..."}
                 disabled={isLoading || isInitializing || !!webGPUError}
-                className="flex-1 bg-transparent border-none py-5 px-6 text-white text-[15px] font-mono tracking-wider focus:outline-none placeholder:text-slate-800 disabled:opacity-30 uppercase"
+                className="flex-1 bg-transparent border-none py-5 px-6 text-slate-950 dark:text-white text-[15px] font-mono tracking-wider focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-800 disabled:opacity-30 uppercase"
               />
               <div className="flex gap-3 pr-2">
                 <button 
                   onClick={requestClearChat}
                   disabled={messages.length === 0}
-                  className="w-14 h-14 flex items-center justify-center bg-white/[0.01] hover:bg-red-500/10 border border-white/5 hover:border-red-500/20 text-slate-700 hover:text-red-400 rounded-2xl transition-all disabled:opacity-10 group"
+                  className="w-14 h-14 flex items-center justify-center bg-transparent hover:bg-red-500/10 border border-slate-900/5 dark:border-white/5 hover:border-red-500/20 text-slate-400 hover:text-red-600 rounded-2xl transition-all disabled:opacity-10 group"
                   title="WIPE HISTORY"
                 >
                   <Trash2 size={20} className="transform group-hover:scale-90 transition-transform" />
