@@ -307,12 +307,12 @@ export const NduChatWindow: React.FC = () => {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <Loader2 className="w-6 h-6 text-cyan-400 animate-spin" />
-                    <div className="absolute inset-0 bg-cyan-400/20 blur-md rounded-full"></div>
+                    <Loader2 className="w-6 h-6 text-cyan-600 dark:text-cyan-400 animate-spin" />
+                    <div className="absolute inset-0 bg-cyan-500/20 dark:bg-cyan-400/20 blur-md rounded-full"></div>
                   </div>
-                  <span className="text-xs font-mono text-cyan-400/80 uppercase tracking-[0.2em] animate-pulse">{loadStatus}</span>
+                  <span className="text-xs font-mono text-cyan-700 dark:text-cyan-400/80 uppercase tracking-[0.2em] animate-pulse">{loadStatus}</span>
                 </div>
-                <span className="text-lg font-mono font-black text-cyan-400">{loadProgress}%</span>
+                <span className="text-lg font-mono font-black text-cyan-600 dark:text-cyan-400">{loadProgress}%</span>
               </div>
               <div className="h-0.5 bg-white/[0.05] rounded-full overflow-hidden">
                 <div 
@@ -328,10 +328,10 @@ export const NduChatWindow: React.FC = () => {
             <div className="p-16 md:p-24 text-center relative overflow-hidden">
               <div className="relative z-10">
                 <div className="w-16 h-16 rounded-2xl bg-cyan-500/5 flex items-center justify-center mx-auto mb-6 border border-cyan-500/20 shadow-xl transform hover:rotate-6 transition-all duration-500 group-welcome">
-                  <Bot className="w-8 h-8 text-cyan-500" />
+                  <Bot className="w-8 h-8 text-cyan-600 dark:text-cyan-500" />
                 </div>
-                <h4 className="text-xl font-black mb-2 text-slate-900 dark:text-white uppercase tracking-tight">System Ready</h4>
-                <p className="text-slate-400/70 mb-14 max-w-sm mx-auto font-mono text-xs uppercase tracking-widest leading-loose">
+                <h4 className="text-xl font-black mb-2 text-slate-950 dark:text-white uppercase tracking-tight">System Ready</h4>
+                <p className="text-slate-600 dark:text-slate-400/70 mb-14 max-w-sm mx-auto font-mono text-xs uppercase tracking-widest leading-loose">
                   Select a prompt to begin neural synchronization
                 </p>
                 
@@ -342,8 +342,8 @@ export const NduChatWindow: React.FC = () => {
                       onClick={() => handleSend(q)}
                       className="group p-6 bg-transparent hover:bg-cyan-500/5 border-none text-left transition-all duration-500"
                     >
-                      <div className="text-[10px] font-mono text-cyan-500 uppercase mb-3 tracking-widest font-bold opacity-40 group-hover:opacity-100">Protocol 0{idx+1}</div>
-                      <span className="text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-cyan-500 dark:group-hover:text-white transition-colors">{q}</span>
+                      <div className="text-[10px] font-mono text-cyan-600 dark:text-cyan-500 uppercase mb-3 tracking-widest font-bold opacity-60 dark:opacity-40 group-hover:opacity-100">Protocol 0{idx+1}</div>
+                      <span className="text-sm font-bold text-slate-800 dark:text-slate-300 group-hover:text-cyan-600 dark:group-hover:text-white transition-colors">{q}</span>
                     </button>
                   ))}
                 </div>
@@ -442,8 +442,8 @@ export const NduChatWindow: React.FC = () => {
             </div>
             
             <div className="flex items-center justify-center gap-4 mt-8">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400 group-hover:rotate-12 transition-transform" />
-              <p className="text-[10px] text-slate-700 font-mono tracking-[0.4em] uppercase font-black">
+              <Sparkles className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 group-hover:rotate-12 transition-transform" />
+              <p className="text-[10px] text-slate-800 dark:text-slate-700 font-mono tracking-[0.4em] uppercase font-black">
                 Neural Proxy Optimized for Davidson.v1.0
               </p>
             </div>
