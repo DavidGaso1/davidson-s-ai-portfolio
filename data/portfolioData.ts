@@ -101,18 +101,6 @@ export const projects = [
     imageUrl: "/projects/vizo_rag_mock_ui.png"
   },
   {
-    title: "Bolt.diy",
-    description: "A collaborative platform to prompt, run, edit, and deploy full-stack web applications using any LLM, modified and enhanced with custom workflows.",
-    tech: ["TypeScript", "Next.JS", "LLM Integration", "Vite"],
-    primaryTech: "TypeScript",
-    github: "https://github.com/DavidGaso1/bolt.diy",
-    repoOwner: "DavidGaso1",
-    repoName: "bolt.diy",
-    stars: 210,
-    forks: 89,
-    imageUrl: "/projects/bolt_diy_mock_ui.png"
-  },
-  {
     title: "N8n Automation Hub",
     description: "A comprehensive collection of AI-driven automation workflows designed for academic research, task management, and API integrations.",
     tech: ["n8n", "JSON", "Automation", "Workflows"],
