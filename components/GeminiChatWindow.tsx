@@ -68,7 +68,7 @@ const SUGGESTED_QUESTIONS = [
   "What certifications does he have?",
 ];
 
-export const GeminiChatWindow: React.FC = () => {
+export const NduChatWindow: React.FC = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'bot'; text: string }[]>([]);
@@ -76,7 +76,7 @@ export const GeminiChatWindow: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // WebLLM State
-  const [engine, setEngine] = useState<webllm.EngineInterface | null>(null);
+  const [engine, setEngine] = useState<webllm.MLCEngineInterface | null>(null);
   const [loadProgress, setLoadProgress] = useState(0);
   const [loadStatus, setLoadStatus] = useState("");
   const [isInitializing, setIsInitializing] = useState(false);
@@ -98,7 +98,7 @@ export const GeminiChatWindow: React.FC = () => {
 
   // Check WebGPU Support
   useEffect(() => {
-    if (!navigator.gpu) {
+    if (!(navigator as any).gpu) {
       setWebGPUError("WebGPU is not supported in this browser. Please use a modern browser like Chrome or Edge for the local AI experience.");
     }
   }, []);
@@ -290,7 +290,7 @@ export const GeminiChatWindow: React.FC = () => {
         {/* Glow behind container */}
         <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/10 via-blue-600/10 to-purple-600/10 rounded-[40px] blur-3xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
         
-        <div className="relative rounded-[40px] overflow-hidden bg-white/[0.02] border border-white/10 backdrop-blur-2xl shadow-2xl">
+        <div className="relative rounded-[40px] overflow-hidden bg-transparent border border-white/10 backdrop-blur-md shadow-2xl">
           
           {/* Diagnostic Banner (Errors) */}
           {webGPUError && (
@@ -338,7 +338,7 @@ export const GeminiChatWindow: React.FC = () => {
                   {SUGGESTED_QUESTIONS.map((q, idx) => (
                     <button
                       key={idx}
-                      onClick ... handleSend(q)}
+                      onClick={() => handleSend(q)}
                       className="group p-6 bg-white/[0.01] hover:bg-cyan-500/5 border border-white/[0.05] hover:border-cyan-500/30 text-left rounded-[24px] transition-all duration-500 backdrop-blur-sm"
                     >
                       <div className="text-[10px] font-mono text-cyan-500/40 uppercase mb-3 tracking-widest">Protocol 0{idx+1}</div>
@@ -407,15 +407,16 @@ export const GeminiChatWindow: React.FC = () => {
           )}
 
           {/* Terminal Input Line - Pure Glass */}
-          <div className="p-10 border-t border-white/[0.05] bg-white/[0.01] backdrop-blur-xl">
+          <div className="p-10 border-t border-white/[0.05] bg-transparent backdrop-blur-xl">
             <div className="flex items-center gap-6 p-2 rounded-[28px] bg-white/[0.02] border border-white/[0.08] focus-within:border-cyan-500/50 focus-within:ring-8 focus-within:ring-cyan-500/5 transition-all duration-500 backdrop-blur-sm">
               <input
                 type="text"
                 value={input}
-                onChange ... (e.target.value);
+                onChange={(e) => {
+                  setInput(e.target.value);
                   resetInactivityTimer();
                 }}
-                onKeyPress={(e) ... !isInitializing && handleSend()}
+                onKeyPress={(e) => e.key === 'Enter' && !isLoading && !isInitializing && handleSend()}
                 placeholder={isInitializing ? "TERMINAL_BUSY ..." : "EXECUTE_QUERY_ ..."}
                 disabled={isLoading || isInitializing || !!webGPUError}
                 className="flex-1 bg-transparent border-none py-5 px-6 text-white text-[15px] font-mono tracking-wider focus:outline-none placeholder:text-slate-800 disabled:opacity-30 uppercase"

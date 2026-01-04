@@ -21,7 +21,7 @@ export const technicalSkills = [
 export const toolsData = [
   { name: 'PostgreSQL', val: 80, color: '#00d9ff' },
   { name: 'Python', val: 80, color: '#a855f7' },
-  { name: 'Claude/Gemini', val: 92, color: '#00d9ff' },
+   { name: 'Claude/Llama', val: 92, color: '#00d9ff' },
   { name: 'Antigravity', val: 95, color: '#a855f7' },
   { name: 'N8N', val: 85, color: '#00d9ff' },
   { name: 'AWS', val: 60, color: '#a855f7' },
@@ -67,7 +67,7 @@ export const projects = [
   {
     title: "Job-Agent",
     description: "An advanced AI-powered job application assistant that automates searches, tailors resumes, and assists in the application process.",
-    tech: ["Python", "Playwright", "Gemini AI", "FastAPI"],
+    tech: ["Python", "Playwright", "Llama 3.1", "FastAPI"],
     primaryTech: "Python / AI",
     github: "https://github.com/DavidGaso1/Job-Agent",
     repoOwner: "DavidGaso1",
@@ -114,8 +114,8 @@ export const projects = [
   },
   {
     title: "AI Assignment Gen",
-    description: "Intelligent tool that generates structured academic assignments with proper citations and professional formatting using Google Gemini.",
-    tech: ["Google Gemini", "HTML/CSS", "JavaScript"],
+    description: "Intelligent tool that generates structured academic assignments with proper citations and professional formatting using Llama 3.1.",
+    tech: ["Llama 3.1", "HTML/CSS", "JavaScript"],
     primaryTech: "GenAI",
     github: "https://github.com/DavidGaso1/AI-Assignment-Gen",
     repoOwner: "DavidGaso1",

@@ -11,7 +11,7 @@ import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { ArrowUp } from 'lucide-react';
 import { NeuralMeshBackground } from './components/Background';
-import { GeminiChatWindow } from './components/GeminiChatWindow';
+import { NduChatWindow } from './components/GeminiChatWindow';
 
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -37,7 +37,7 @@ const App: React.FC = () => {
         <Navbar />
         <main>
           <section id="home"><Hero /></section>
-          <section id="ask-ndu" className="py-20 md:py-32"><GeminiChatWindow /></section>
+          <section id="ask-ndu" className="py-20 md:py-32"><NduChatWindow /></section>
           <section id="about" className="py-20 md:py-32 bg-[#0d122b]/50"><About /></section>
           <section id="skills" className="py-20 md:py-32"><Skills /></section>
           <section id="projects" className="py-20 md:py-32 bg-[#0d122b]/50"><Projects /></section>
