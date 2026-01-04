@@ -288,9 +288,9 @@ export const GeminiChatWindow: React.FC = () => {
       {/* Main Glass UI Container */}
       <div className="max-w-4xl mx-auto relative group">
         {/* Glow behind container */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-blue-600/20 to-purple-600/20 rounded-[40px] blur-3xl opacity-30 group-hover:opacity-60 transition duration-1000"></div>
+        <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/10 via-blue-600/10 to-purple-600/10 rounded-[40px] blur-3xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
         
-        <div className="relative rounded-[40px] overflow-hidden bg-white/[0.01] border border-white/[0.08] backdrop-blur-[50px] shadow-2xl">
+        <div className="relative rounded-[40px] overflow-hidden bg-white/[0.02] border border-white/10 backdrop-blur-2xl shadow-2xl">
           
           {/* Diagnostic Banner (Errors) */}
           {webGPUError && (
@@ -300,14 +300,14 @@ export const GeminiChatWindow: React.FC = () => {
             </div>
           )}
 
-          {/* Boot Sequence (Loading) */}
+          {/* Boot Sequence (Loading) - Transparent */}
           {isInitializing && (
-            <div className="p-10 border-b border-white/[0.05] bg-cyan-500/[0.02]">
+            <div className="p-10 border-b border-white/[0.05] bg-white/[0.01]">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-4">
                   <div className="relative">
                     <Loader2 className="w-6 h-6 text-cyan-400 animate-spin" />
-                    <div className="absolute inset-0 bg-cyan-400/30 blur-md rounded-full"></div>
+                    <div className="absolute inset-0 bg-cyan-400/20 blur-md rounded-full"></div>
                   </div>
                   <span className="text-xs font-mono text-cyan-400/80 uppercase tracking-[0.2em] animate-pulse">{loadStatus}</span>
                 </div>
@@ -322,7 +322,7 @@ export const GeminiChatWindow: React.FC = () => {
             </div>
           )}
           
-          {/* Interaction Buffer (Chat Window) */}
+          {/* Interaction Buffer (Chat Window) - No solid bg */}
           {!hasStarted ? (
             <div className="p-16 md:p-24 text-center relative overflow-hidden">
               <div className="relative z-10">
@@ -338,8 +338,8 @@ export const GeminiChatWindow: React.FC = () => {
                   {SUGGESTED_QUESTIONS.map((q, idx) => (
                     <button
                       key={idx}
-                      onClick={() => handleSend(q)}
-                      className="group p-6 bg-white/[0.02] hover:bg-cyan-500/5 border border-white/[0.05] hover:border-cyan-500/30 text-left rounded-[24px] transition-all duration-500"
+                      onClick ... handleSend(q)}
+                      className="group p-6 bg-white/[0.01] hover:bg-cyan-500/5 border border-white/[0.05] hover:border-cyan-500/30 text-left rounded-[24px] transition-all duration-500 backdrop-blur-sm"
                     >
                       <div className="text-[10px] font-mono text-cyan-500/40 uppercase mb-3 tracking-widest">Protocol 0{idx+1}</div>
                       <span className="text-sm font-bold text-slate-300 group-hover:text-white transition-colors">{q}</span>
@@ -348,25 +348,24 @@ export const GeminiChatWindow: React.FC = () => {
                 </div>
               </div>
 
-              {/* Distant light effects */}
+              {/* Decorative light effects */}
               <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-cyan-500/5 blur-[120px] -z-10 rounded-full animate-pulse"></div>
               <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-purple-600/5 blur-[120px] -z-10 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
             </div>
           ) : (
             <div 
               ref={scrollRef} 
-              className="h-[650px] overflow-y-auto p-10 space-y-10 no-scrollbar custom-scrollbar bg-black/10"
+              className="h-[650px] overflow-y-auto p-10 space-y-10 no-scrollbar custom-scrollbar"
             >
               <style>{`
                 .custom-scrollbar::-webkit-scrollbar { width: 3px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.1); border-radius: 10px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
               `}</style>
               {messages.map((msg, i) => (
                 <div key={i} className={`flex gap-6 ${msg.role === 'user' ? 'flex-row-reverse' : ''} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
                   <div className="flex-shrink-0 mt-1">
                     {msg.role === 'bot' ? (
                       <div className="w-12 h-12 rounded-2xl bg-white/[0.02] p-3 flex items-center justify-center border border-white/10 backdrop-blur-xl shadow-xl">
-                        <div className="absolute inset-0 bg-cyan-500/5 blur-md rounded-full"></div>
                         <Bot className="w-8 h-8 text-cyan-400 relative z-10" />
                       </div>
                     ) : (
@@ -376,9 +375,9 @@ export const GeminiChatWindow: React.FC = () => {
                     )}
                   </div>
                   
-                  <div className={`max-w-[80%] px-8 py-6 rounded-[32px] text-[15px] leading-relaxed shadow-sm transition-all ${
+                  <div className={`max-w-[80%] px-8 py-6 rounded-[32px] text-[15px] leading-relaxed shadow-sm transition-all backdrop-blur-md ${
                     msg.role === 'user' 
-                      ? 'bg-white/[0.05] text-white rounded-tr-sm border border-white/10' 
+                      ? 'bg-white/[0.04] text-white rounded-tr-sm border border-white/10' 
                       : 'bg-white/[0.01] text-slate-200 border border-white/[0.03] rounded-tl-sm'
                   }`}>
                     {msg.role === 'bot' ? (
@@ -392,14 +391,14 @@ export const GeminiChatWindow: React.FC = () => {
               
               {isLoading && (
                 <div className="flex gap-6 animate-in fade-in duration-300">
-                  <div className="w-12 h-12 rounded-2xl bg-white/[0.02] p-3 flex items-center justify-center border border-white/10">
+                  <div className="w-12 h-12 rounded-2xl bg-white/[0.02] p-3 flex items-center justify-center border border-white/10 backdrop-blur-xl">
                     <Loader2 className="w-5 h-5 text-cyan-400 animate-spin" />
                   </div>
-                  <div className="bg-white/[0.01] border border-white/[0.05] px-7 py-5 rounded-[32px] rounded-tl-sm backdrop-blur-sm">
+                  <div className="bg-white/[0.01] border border-white/[0.05] px-7 py-5 rounded-[32px] rounded-tl-sm backdrop-blur-md">
                     <div className="flex gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/60 animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/60 animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/60 animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/40 animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/40 animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/40 animate-bounce" style={{ animationDelay: '300ms' }}></div>
                     </div>
                   </div>
                 </div>
@@ -407,17 +406,16 @@ export const GeminiChatWindow: React.FC = () => {
             </div>
           )}
 
-          {/* Terminal Input Line */}
-          <div className="p-10 border-t border-white/[0.05] bg-black/20">
-            <div className="flex items-center gap-6 p-2 rounded-[28px] bg-white/[0.02] border border-white/[0.08] focus-within:border-cyan-500/50 focus-within:ring-8 focus-within:ring-cyan-500/5 transition-all duration-500">
+          {/* Terminal Input Line - Pure Glass */}
+          <div className="p-10 border-t border-white/[0.05] bg-white/[0.01] backdrop-blur-xl">
+            <div className="flex items-center gap-6 p-2 rounded-[28px] bg-white/[0.02] border border-white/[0.08] focus-within:border-cyan-500/50 focus-within:ring-8 focus-within:ring-cyan-500/5 transition-all duration-500 backdrop-blur-sm">
               <input
                 type="text"
                 value={input}
-                onChange={(e) => {
-                  setInput(e.target.value);
+                onChange ... (e.target.value);
                   resetInactivityTimer();
                 }}
-                onKeyPress={(e) => e.key === 'Enter' && !isLoading && !isInitializing && handleSend()}
+                onKeyPress={(e) ... !isInitializing && handleSend()}
                 placeholder={isInitializing ? "TERMINAL_BUSY ..." : "EXECUTE_QUERY_ ..."}
                 disabled={isLoading || isInitializing || !!webGPUError}
                 className="flex-1 bg-transparent border-none py-5 px-6 text-white text-[15px] font-mono tracking-wider focus:outline-none placeholder:text-slate-800 disabled:opacity-30 uppercase"
@@ -426,7 +424,7 @@ export const GeminiChatWindow: React.FC = () => {
                 <button 
                   onClick={requestClearChat}
                   disabled={messages.length === 0}
-                  className="w-14 h-14 flex items-center justify-center bg-white/[0.02] hover:bg-red-500/10 border border-white/5 hover:border-red-500/20 text-slate-700 hover:text-red-400 rounded-2xl transition-all disabled:opacity-10 group"
+                  className="w-14 h-14 flex items-center justify-center bg-white/[0.01] hover:bg-red-500/10 border border-white/5 hover:border-red-500/20 text-slate-700 hover:text-red-400 rounded-2xl transition-all disabled:opacity-10 group"
                   title="WIPE HISTORY"
                 >
                   <Trash2 size={20} className="transform group-hover:scale-90 transition-transform" />
@@ -443,7 +441,7 @@ export const GeminiChatWindow: React.FC = () => {
             
             <div className="flex items-center justify-center gap-4 mt-8">
               <Sparkles className="w-3.5 h-3.5 text-cyan-400 group-hover:rotate-12 transition-transform" />
-              <p className="text-[10px] text-slate-600 font-mono tracking-[0.4em] uppercase font-black">
+              <p className="text-[10px] text-slate-700 font-mono tracking-[0.4em] uppercase font-black">
                 Neural Proxy Optimized for Davidson.v1.0
               </p>
             </div>
