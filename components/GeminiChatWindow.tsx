@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, Sparkles, User, Zap, Trash2, Download } from 'lucide-react';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { Send, Bot, Sparkles, User, Zap, Trash2, Loader2, AlertCircle, Info } from 'lucide-react';
+import * as webllm from "@mlc-ai/web-llm";
 import { 
   PERSONAL_INFO, technicalSkills, toolsData, softSkills, 
   experiences, projects, certifications 
 } from '../data/portfolioData';
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+// Model configuration
+const SELECTED_MODEL = "Llama-3.1-8B-Instruct-q4f16_1-MLC";
 
 // Dynamically generated Portfolio Knowledge Base
 const PORTFOLIO_KNOWLEDGE = `
@@ -54,26 +55,16 @@ ${PORTFOLIO_KNOWLEDGE}
    - Use **bold** for project names, company names, and important terms
    - Use bullet points (•) for listing items
    - Add line breaks between sections for readability
-   - When listing projects or skills, put each on its own line
-
-2. Example format for listing projects:
-   "Davidson has built the following projects:
-   
-   • **RAG System for ViZO Technologies** - Intelligent document querying with vector embeddings (Python, LangChain)
-   
-   • **AI Assistant Automation Workflow** - N8N workflow with Gemini and Supabase integration
-   
-   • **AI Academic Assignment Generator** - Automated essay generator with citations"
-
-3. ONLY answer from the portfolio data above.
-4. Politely decline off-topic questions.
-5. Be friendly and professional.
+2. ONLY answer from the portfolio data above.
+3. Politely decline off-topic questions.
+4. Be friendly and professional.
+5. KEEP RESPONSES CONCISE AND FOCUSED.
 `;
 
 const SUGGESTED_QUESTIONS = [
   "What projects has Davidson built?",
-  "Tell me about his skills",
-  "Where does he work?",
+  "Tell me about his technical skills",
+  "Where does he work currently?",
   "What certifications does he have?",
 ];
 
@@ -84,11 +75,17 @@ export const GeminiChatWindow: React.FC = () => {
   const [hasStarted, setHasStarted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // WebLLM State
+  const [engine, setEngine] = useState<webllm.EngineInterface | null>(null);
+  const [loadProgress, setLoadProgress] = useState(0);
+  const [loadStatus, setLoadStatus] = useState("");
+  const [isInitializing, setIsInitializing] = useState(false);
+  const [webGPUError, setWebGPUError] = useState<string | null>(null);
+
   // Inactivity Timer State
   const [lastActivityTime, setLastActivityTime] = useState(Date.now());
   const [showInactivityWarning, setShowInactivityWarning] = useState(false);
-  const [inactivityCountdown, setInactivityCountdown] = useState(60); // 60 seconds to cancel
-  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [inactivityCountdown, setInactivityCountdown] = useState(60);
   const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const resetInactivityTimer = () => {
@@ -96,6 +93,47 @@ export const GeminiChatWindow: React.FC = () => {
     if (showInactivityWarning) {
       setShowInactivityWarning(false);
       setInactivityCountdown(60);
+    }
+  };
+
+  // Check WebGPU Support
+  useEffect(() => {
+    if (!navigator.gpu) {
+      setWebGPUError("WebGPU is not supported in this browser. Please use a modern browser like Chrome or Edge for the local AI experience.");
+    }
+  }, []);
+
+  // Initialize WebLLM Engine on demand
+  const initializeEngine = async () => {
+    if (engine || isInitializing) return;
+    
+    setIsInitializing(true);
+    setLoadStatus("Initializing WebGPU...");
+    
+    try {
+      const chatOpts: webllm.ChatOptions = {
+        temperature: 0.7,
+        top_p: 0.95,
+      };
+
+      const engineInstance = await webllm.CreateMLCEngine(
+        SELECTED_MODEL,
+        {
+          initProgressCallback: (report: webllm.InitProgressReport) => {
+            setLoadProgress(Math.round(report.progress * 100));
+            setLoadStatus(report.text);
+          },
+        },
+        chatOpts
+      );
+      
+      setEngine(engineInstance);
+      setIsInitializing(false);
+      setLoadStatus("Ready");
+    } catch (err: any) {
+      console.error("WebLLM initialization error:", err);
+      setWebGPUError(`Failed to initialize AI: ${err.message || 'Unknown error'}`);
+      setIsInitializing(false);
     }
   };
 
@@ -115,14 +153,10 @@ export const GeminiChatWindow: React.FC = () => {
     }
   }, []);
 
-  // Save chat to localStorage whenever messages change
+  // Save chat to localStorage
   useEffect(() => {
     if (messages.length > 0) {
-      try {
-        localStorage.setItem('ndu_chat_history', JSON.stringify(messages));
-      } catch (e) {
-        console.error('Failed to save chat history:', e);
-      }
+      localStorage.setItem('ndu_chat_history', JSON.stringify(messages));
     }
   }, [messages]);
 
@@ -133,13 +167,10 @@ export const GeminiChatWindow: React.FC = () => {
     const checkInactivity = () => {
       const idleTime = Date.now() - lastActivityTime;
       const fiveMinutes = 5 * 60 * 1000;
-
-      if (idleTime >= fiveMinutes) {
-        setShowInactivityWarning(true);
-      }
+      if (idleTime >= fiveMinutes) setShowInactivityWarning(true);
     };
 
-    const interval = setInterval(checkInactivity, 10000); // Check every 10s
+    const interval = setInterval(checkInactivity, 10000);
     return () => clearInterval(interval);
   }, [lastActivityTime, hasStarted, messages.length, showInactivityWarning]);
 
@@ -150,11 +181,9 @@ export const GeminiChatWindow: React.FC = () => {
         confirmClear();
         return;
       }
-
       countdownTimerRef.current = setTimeout(() => {
         setInactivityCountdown(prev => prev - 1);
       }, 1000);
-
       return () => {
         if (countdownTimerRef.current) clearTimeout(countdownTimerRef.current);
       };
@@ -164,34 +193,19 @@ export const GeminiChatWindow: React.FC = () => {
   // Format markdown-style text to HTML
   const formatMessage = (text: string) => {
     return text
-      // Bold: **text** or __text__
       .replace(/\*\*(.+?)\*\*/g, '<strong class="text-cyan-300 font-semibold">$1</strong>')
       .replace(/__(.+?)__/g, '<strong class="text-cyan-300 font-semibold">$1</strong>')
-      // Bullet lists: lines starting with •, -, or *
       .replace(/^[•\-\*]\s+(.+)$/gm, '<div class="flex gap-2 my-1"><span class="text-white/40">•</span><span class="flex-1">$1</span></div>')
-      // Numbered lists: lines starting with 1. 2. etc
       .replace(/^(\d+)\.\s+(.+)$/gm, '<div class="flex gap-2 my-1"><span class="text-cyan-400/60 font-mono text-xs">$1.</span><span class="flex-1">$2</span></div>')
-      // Custom link/button detection for common portfolio links - Compact Version
-      .replace(/(GitHub|LinkedIn|Email|Portfolio):\s*(https?:\/\/[^\s\n<]+|[\w\.\-]+@[\w\.\-]+\.[a-z]{2,})/gi, (match, type, url) => {
-        const href = url.includes('@') ? `mailto:${url}` : url;
-        const label = type || 'Visit';
-        return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/[0.03] hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/30 rounded-lg text-[11px] font-medium text-slate-300 hover:text-cyan-400 transition-all no-underline shadow-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-          ${label}
-        </a>`;
-      })
-      // Double line breaks for paragraph spacing
       .replace(/\n\n/g, '</p><p class="mt-3">')
-      // Single line breaks
       .replace(/\n/g, '<br />');
   };
 
-  // Scroll to bottom when messages update
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isLoading]);
+  }, [messages, isLoading, isInitializing]);
 
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
@@ -201,24 +215,6 @@ export const GeminiChatWindow: React.FC = () => {
   };
 
   const confirmClear = async () => {
-    const historyData = {
-      timestamp: new Date().toISOString(),
-      messages: messages
-    };
-
-    try {
-      // Send history to backend securely
-      await fetch('http://localhost:3001/api/save-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(historyData),
-      });
-      console.log("Chat history synced with Davidson's backend.");
-    } catch (err) {
-      console.error("Failed to sync history with backend:", err);
-    }
-
-    // Clear local state
     setMessages([]);
     setHasStarted(false);
     localStorage.removeItem('ndu_chat_history');
@@ -232,35 +228,38 @@ export const GeminiChatWindow: React.FC = () => {
 
     if (!hasStarted) setHasStarted(true);
     
+    // Auto-initialize engine if not ready
+    if (!engine) {
+      await initializeEngine();
+    }
+
     setMessages((prev) => [...prev, { role: 'user', text: messageToSend }]);
     setInput('');
     setIsLoading(true);
 
     try {
-      if (!API_KEY) throw new Error("API_KEY_MISSING");
+      if (!engine) throw new Error("ENGINE_NOT_READY");
 
-      const genAI = new GoogleGenerativeAI(API_KEY);
-      const model = genAI.getGenerativeModel({ 
-        model: "gemini-2.5-flash",
-        systemInstruction: SYSTEM_PROMPT,
+      const conversation = [
+        { role: "system", content: SYSTEM_PROMPT },
+        ...messages.map(msg => ({ 
+          role: msg.role === 'user' ? 'user' : 'assistant' as "user" | "assistant" | "system", 
+          content: msg.text 
+        })),
+        { role: "user", content: messageToSend }
+      ];
+
+      const reply = await engine.chat.completions.create({
+        messages: conversation as webllm.ChatCompletionMessageParam[],
       });
 
-      const chatHistory = messages.map(msg => ({
-        role: msg.role === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.text }],
-      }));
-
-      const chat = model.startChat({ history: chatHistory });
-      const result = await chat.sendMessage(messageToSend);
-      const text = result.response.text();
-
+      const text = reply.choices[0].message.content || "I'm sorry, I couldn't generate a response.";
       setMessages((prev) => [...prev, { role: 'bot', text }]);
     } catch (error: any) {
-      let errorMessage = "I'm having trouble connecting. Please try again.";
-      if (error.message === "API_KEY_MISSING") {
-        errorMessage = "⚠️ API not configured. Please contact Davidson.";
-      } else if (error.message?.includes("429") || error.message?.includes("quota")) {
-        errorMessage = "I'm busy right now! Please try again in a minute. 🙏";
+      console.error("Chat error:", error);
+      let errorMessage = "I'm having trouble processing your request locally.";
+      if (error.message === "ENGINE_NOT_READY") {
+        errorMessage = "The AI is still warming up. Please wait a moment...";
       }
       setMessages((prev) => [...prev, { role: 'bot', text: errorMessage }]);
     } finally {
@@ -272,39 +271,70 @@ export const GeminiChatWindow: React.FC = () => {
     <div className="max-w-7xl mx-auto px-6 relative">
       {/* Header */}
       <div className="text-center mb-12">
-        <h2 className="text-sm font-mono text-cyan-400 uppercase tracking-widest mb-4">Interactive</h2>
+        <h2 className="text-sm font-mono text-cyan-400 uppercase tracking-widest mb-4">Privacy-First AI</h2>
         <h3 className="text-4xl md:text-5xl font-display font-bold mb-4">
           Ask <span className="gradient-text">Ndu</span> Anything
         </h3>
         <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto">
-          Meet Ndu, my AI assistant. Ask about my projects, skills, experience, or certifications.
+          Meet Ndu, my local AI assistant. Everything stays in your browser – no API keys, no data tracking.
         </p>
       </div>
 
-      {/* Chat Container - Fully transparent, no borders */}
+      {/* Chat Container */}
       <div className="max-w-3xl mx-auto relative">
-        <div className="rounded-3xl overflow-hidden">
+        <div className="rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 backdrop-blur-xl">
           
+          {/* WebGPU Support Banner */}
+          {webGPUError && (
+            <div className="bg-red-500/10 border-b border-red-500/20 p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+              <p className="text-xs text-red-200 leading-relaxed">{webGPUError}</p>
+            </div>
+          )}
+
+          {/* Model Loading Progress */}
+          {isInitializing && (
+            <div className="p-6 border-b border-white/5 bg-cyan-500/5 animate-in fade-in slide-in-from-top-4 duration-500">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 text-cyan-400 animate-spin" />
+                  <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider">{loadStatus}</span>
+                </div>
+                <span className="text-xs font-mono text-cyan-400">{loadProgress}%</span>
+              </div>
+              <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-cyan-500 transition-all duration-300 ease-out shadow-[0_0_10px_rgba(6,182,212,0.5)]"
+                  style={{ width: `${loadProgress}%` }}
+                ></div>
+              </div>
+              <p className="mt-4 text-[10px] text-slate-500 flex items-center gap-1.5 uppercase font-semibold">
+                <Info size={12} /> First-time setup: Downloading a lightweight model to your browser cache.
+              </p>
+            </div>
+          )}
           
           {/* Welcome State or Chat Messages */}
           {!hasStarted ? (
             <div className="p-8 md:p-12 text-center">
-              <h4 className="text-xl font-display font-bold mb-3 text-white">Hello! I'm Ndu 👋</h4>
-              <p className="text-slate-400 mb-8 max-w-md mx-auto">
-                I'm Davidson's AI portfolio assistant. Ask me about his projects, skills, work experience, and certifications.
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-8 border border-cyan-500/20 shadow-[0_0_30px_-10px_rgba(6,182,212,0.3)]">
+                <Bot className="w-10 h-10 text-cyan-400" />
+              </div>
+              <h4 className="text-2xl font-display font-bold mb-3 text-white">Hello! I'm Ndu 👋</h4>
+              <p className="text-slate-400 mb-10 max-w-md mx-auto leading-relaxed">
+                I'm Davidson's AI portfolio assistant. I run locally on your device for absolute privacy and speed.
               </p>
               
-              {/* Suggested Questions */}
-              <div className="space-y-3">
-                <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Try asking:</p>
-                <div className="flex flex-wrap justify-center gap-2">
+              <div className="space-y-4">
+                <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Suggested Topics:</p>
+                <div className="flex flex-wrap justify-center gap-3">
                   {SUGGESTED_QUESTIONS.map((q, idx) => (
                     <button
                       key={idx}
                       onClick={() => handleSend(q)}
-                      className="px-4 py-2 backdrop-blur-sm bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 hover:border-cyan-500/40 text-slate-300 hover:text-cyan-400 text-sm rounded-full transition-all duration-300 flex items-center gap-2"
+                      className="px-5 py-2.5 backdrop-blur-md bg-white/[0.03] hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/40 text-slate-300 hover:text-cyan-400 text-sm rounded-2xl transition-all duration-300 flex items-center gap-2 group"
                     >
-                      <Zap className="w-3 h-3" /> {q}
+                      <Zap className="w-3.5 h-3.5 text-cyan-500 group-hover:scale-110 transition-transform" /> {q}
                     </button>
                   ))}
                 </div>
@@ -313,37 +343,31 @@ export const GeminiChatWindow: React.FC = () => {
           ) : (
             <div 
               ref={scrollRef} 
-              className="h-[400px] overflow-y-auto p-6 space-y-4 no-scrollbar"
-              style={{
-                scrollbarWidth: 'none',   /* Firefox */
-                msOverflowStyle: 'none',  /* IE and Edge */
-              }}
+              className="h-[500px] overflow-y-auto p-6 space-y-6 no-scrollbar custom-scrollbar"
             >
               <style>{`
-                .no-scrollbar::-webkit-scrollbar {
-                  display: none; /* Safari and Chrome */
-                }
+                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
               `}</style>
               {messages.map((msg, i) => (
-                <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                  {/* Avatar */}
-                  <div className="flex-shrink-0">
+                <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                  <div className="flex-shrink-0 mt-1">
                     {msg.role === 'bot' ? (
-                      <div className="w-9 h-9 rounded-full overflow-hidden bg-white flex items-center justify-center">
-                        <img src="/logo.png" alt="Ndu" className="w-7 h-7 object-contain" />
+                      <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/10 p-2 flex items-center justify-center border border-white/10 backdrop-blur-md shadow-lg">
+                        <Bot className="w-6 h-6 text-cyan-400" />
                       </div>
                     ) : (
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500/80 to-pink-500/80 flex items-center justify-center backdrop-blur-sm border border-purple-500/30">
-                        <User className="w-4 h-4 text-white" />
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-600 to-blue-700 flex items-center justify-center border border-cyan-500/20 shadow-lg">
+                        <User className="w-5 h-5 text-white" />
                       </div>
                     )}
                   </div>
                   
-                  {/* Message */}
-                  <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+                  <div className={`max-w-[85%] px-5 py-4 rounded-3xl text-[15px] leading-relaxed shadow-sm ${
                     msg.role === 'user' 
-                      ? 'bg-gradient-to-r from-cyan-600/90 to-blue-600/90 text-white rounded-br-sm backdrop-blur-sm' 
-                      : 'bg-white/[0.05] text-slate-200 border border-white/10 rounded-bl-sm backdrop-blur-sm'
+                      ? 'bg-cyan-600/20 text-white rounded-tr-sm border border-cyan-500/20 backdrop-blur-sm' 
+                      : 'bg-white/[0.03] text-slate-200 border border-white/5 rounded-tl-sm backdrop-blur-sm'
                   }`}>
                     {msg.role === 'bot' ? (
                       <div dangerouslySetInnerHTML={{ __html: formatMessage(msg.text) }} />
@@ -354,42 +378,26 @@ export const GeminiChatWindow: React.FC = () => {
                 </div>
               ))}
               
-              {/* Typing Indicator */}
               {isLoading && (
-                <div className="flex gap-3">
-                  <div className="w-9 h-9 rounded-full overflow-hidden bg-white flex items-center justify-center">
-                    <img src="/logo.png" alt="Ndu" className="w-7 h-7 object-contain" />
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/10 p-2 flex items-center justify-center border border-white/10 backdrop-blur-md">
+                    <Bot className="w-6 h-6 text-cyan-400 animate-pulse" />
                   </div>
-                  <div className="bg-white/[0.05] border border-white/10 px-4 py-3 rounded-2xl rounded-bl-sm backdrop-blur-sm">
+                  <div className="bg-white/[0.03] border border-white/5 px-5 py-4 rounded-3xl rounded-tl-sm backdrop-blur-sm">
                     <div className="flex gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '300ms' }}></span>
                     </div>
                   </div>
-                </div>
-              )}
-
-              {/* Suggested Questions after Bot Response */}
-              {!isLoading && messages.length > 0 && messages[messages.length - 1].role === 'bot' && (
-                <div className="flex flex-wrap gap-2 ml-12 mt-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                  {SUGGESTED_QUESTIONS.map((q, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => handleSend(q)}
-                      className="px-3 py-1.5 bg-white/[0.03] hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/30 rounded-full text-[11px] text-slate-400 hover:text-cyan-400 transition-all"
-                    >
-                      {q}
-                    </button>
-                  ))}
                 </div>
               )}
             </div>
           )}
 
           {/* Input Area */}
-          <div className="p-4 md:p-6 border-t border-white/5 bg-white/[0.02]">
-            <div className="flex items-center gap-3">
+          <div className="p-6 border-t border-white/5 bg-black/20 backdrop-blur-2xl">
+            <div className="flex items-center gap-4">
               <input
                 type="text"
                 value={input}
@@ -397,95 +405,53 @@ export const GeminiChatWindow: React.FC = () => {
                   setInput(e.target.value);
                   resetInactivityTimer();
                 }}
-                onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSend()}
-                placeholder="Ask me about Davidson's work..."
-                disabled={isLoading}
-                className="flex-1 bg-white/[0.05] border border-white/10 focus:border-cyan-500/50 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 placeholder:text-slate-500 transition-all backdrop-blur-sm disabled:opacity-50"
+                onKeyPress={(e) => e.key === 'Enter' && !isLoading && !isInitializing && handleSend()}
+                placeholder={isInitializing ? "Initializing AI..." : "Ask me anything..."}
+                disabled={isLoading || isInitializing || !!webGPUError}
+                className="flex-1 bg-white/[0.04] border border-white/10 focus:border-cyan-500/40 rounded-2xl py-4 px-6 text-white text-[15px] focus:outline-none focus:ring-4 focus:ring-cyan-500/10 placeholder:text-slate-600 transition-all disabled:opacity-50"
               />
-              <button 
-                onClick={requestClearChat}
-                disabled={messages.length === 0}
-                className="p-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded-xl transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed group relative"
-                title="Clear Chat & Save History"
-              >
-                <Trash2 size={18} />
-                <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity">Clear & Save</span>
-              </button>
-              <button 
-                onClick={() => handleSend()}
-                disabled={isLoading || !input.trim()}
-                className="p-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 disabled:from-slate-700 disabled:to-slate-700 text-white rounded-xl transition-all duration-200 disabled:cursor-not-allowed hover:scale-105 disabled:hover:scale-100"
-              >
-                <Send size={18} />
-              </button>
+              <div className="flex gap-2">
+                <button 
+                  onClick={requestClearChat}
+                  disabled={messages.length === 0}
+                  className="p-4 bg-white/[0.02] hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 text-slate-500 hover:text-red-400 rounded-2xl transition-all disabled:opacity-30 group relative"
+                >
+                  <Trash2 size={20} />
+                </button>
+                <button 
+                  onClick={() => handleSend()}
+                  disabled={isLoading || isInitializing || !input.trim() || !!webGPUError}
+                  className="p-4 bg-gradient-to-r from-cyan-600 to-blue-700 hover:scale-105 active:scale-95 disabled:scale-100 disabled:opacity-50 disabled:grayscale transition-all text-white rounded-2xl shadow-lg shadow-cyan-500/20"
+                >
+                  <Send size={20} />
+                </button>
+              </div>
             </div>
-            <div className="flex items-center justify-center gap-2 mt-3">
-              <Sparkles className="w-3 h-3 text-purple-400" />
-              <p className="text-[10px] text-slate-500 font-mono">
-                Powered by Gemini 2.5 Flash • Portfolio-focused AI
+            <div className="flex items-center justify-center gap-3 mt-5">
+              <Zap className="w-3 h-3 text-cyan-400" />
+              <p className="text-[10px] text-slate-600 font-mono tracking-widest uppercase font-bold">
+                Running {SELECTED_MODEL} Locally via WebLLM
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Custom Confirmation Modal */}
+      {/* Confirmation Modals (Keep Existing Logic) */}
       {showClearConfirm && (
         <div className="absolute inset-0 z-50 flex items-center justify-center p-4">
-          <div 
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm rounded-3xl"
-            onClick={() => setShowClearConfirm(false)}
-          ></div>
-          <div className="relative w-full max-w-sm bg-[#0f172a] border border-white/10 p-6 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200">
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm rounded-3xl" onClick={() => setShowClearConfirm(false)}></div>
+          <div className="relative w-full max-w-sm bg-slate-900 border border-white/10 p-8 rounded-3xl shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
-                <Trash2 className="w-6 h-6 text-red-500" />
+              <div className="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center mb-6">
+                <Trash2 className="w-7 h-7 text-red-500" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Clear Conversation?</h3>
-              <p className="text-slate-400 text-sm mb-6">
-                This will clear your chat history. A secure copy will be saved to Davidson's backend for quality review.
-              </p>
+              <h3 className="text-xl font-bold text-white mb-3">Clear Chat?</h3>
+              <p className="text-slate-400 text-sm mb-8 leading-relaxed">This will reset your local conversation with Ndu. Davidson's portfolio remains unchanged.</p>
               <div className="flex gap-3 w-full">
-                <button
-                  onClick={() => setShowClearConfirm(false)}
-                  className="flex-1 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-slate-300 font-medium transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmClear}
-                  className="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl shadow-lg shadow-red-500/20 transition-all"
-                >
-                  Clear & Save
-                </button>
+                <button onClick={() => setShowClearConfirm(false)} className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-slate-300 font-semibold transition-all">Cancel</button>
+                <button onClick={confirmClear} className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-2xl shadow-lg shadow-red-500/20 transition-all">Clear</button>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Inactivity Warning Modal */}
-      {showInactivityWarning && (
-        <div className="absolute inset-0 z-[60] flex items-center justify-center p-4">
-          <div 
-            className="absolute inset-0 bg-slate-950/80 backdrop-blur-md rounded-3xl"
-          ></div>
-          <div className="relative w-full max-w-sm bg-[#0f172a] border border-cyan-500/30 p-8 rounded-3xl shadow-[0_0_50px_-12px_rgba(6,182,212,0.5)] animate-in zoom-in-95 duration-300">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-full bg-cyan-500/10 flex items-center justify-center mb-6 animate-pulse">
-                <Bot className="w-8 h-8 text-cyan-400" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-3">Still there?</h3>
-              <p className="text-slate-400 text-sm mb-8 leading-relaxed">
-                I'll be clearing our chat in <span className="text-cyan-400 font-mono font-bold">{inactivityCountdown}s</span> to save space. Davidson will still receive a copy of our talk!
-              </p>
-              
-              <button
-                onClick={resetInactivityTimer}
-                className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-2xl shadow-lg shadow-cyan-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
-              >
-                Stay Connected
-              </button>
             </div>
           </div>
         </div>
@@ -493,3 +459,4 @@ export const GeminiChatWindow: React.FC = () => {
     </div>
   );
 };
+
