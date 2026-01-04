@@ -291,7 +291,7 @@ export const NduChatWindow: React.FC = () => {
         {/* Glow behind container */}
         <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/10 via-blue-600/10 to-purple-600/10 rounded-[40px] blur-3xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
         
-        <div className="relative rounded-[40px] overflow-hidden bg-transparent border border-white/10 backdrop-blur-md shadow-2xl">
+        <div className="relative rounded-[40px] overflow-hidden bg-transparent shadow-none">
           
           {/* Diagnostic Banner (Errors) */}
           {webGPUError && (
@@ -340,10 +340,10 @@ export const NduChatWindow: React.FC = () => {
                     <button
                       key={idx}
                       onClick={() => handleSend(q)}
-                      className="group p-6 bg-slate-900/[0.03] hover:bg-cyan-500/10 border border-slate-900/5 hover:border-cyan-500/30 text-left rounded-[24px] transition-all duration-500 backdrop-blur-md shadow-sm"
+                      className="group p-6 bg-transparent hover:bg-cyan-500/5 border-none text-left transition-all duration-500"
                     >
-                      <div className="text-[10px] font-mono text-cyan-600 uppercase mb-3 tracking-widest font-bold">Protocol 0{idx+1}</div>
-                      <span className="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors">{q}</span>
+                      <div className="text-[10px] font-mono text-cyan-500 uppercase mb-3 tracking-widest font-bold opacity-40 group-hover:opacity-100">Protocol 0{idx+1}</div>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-cyan-500 dark:group-hover:text-white transition-colors">{q}</span>
                     </button>
                   ))}
                 </div>
@@ -376,10 +376,10 @@ export const NduChatWindow: React.FC = () => {
                     )}
                   </div>
                   
-                  <div className={`max-w-[80%] px-8 py-6 rounded-[32px] text-[15px] leading-relaxed shadow-sm transition-all backdrop-blur-md ${
+                  <div className={`max-w-[80%] px-8 py-6 rounded-[32px] text-[15px] leading-relaxed transition-all ${
                     msg.role === 'user' 
-                      ? 'bg-cyan-600/10 dark:bg-white/[0.04] text-slate-900 dark:text-white rounded-tr-sm border border-cyan-600/10 dark:border-white/10' 
-                      : 'bg-slate-900/[0.03] dark:bg-white/[0.01] text-slate-700 dark:text-slate-200 border border-slate-900/5 dark:border-white/[0.03] rounded-tl-sm'
+                      ? 'bg-transparent text-slate-900 dark:text-white border-l-2 border-cyan-500/50 pl-6' 
+                      : 'bg-transparent text-slate-700 dark:text-slate-200 border-l-2 border-white/10 pl-6'
                   }`}>
                     {msg.role === 'bot' ? (
                       <div dangerouslySetInnerHTML={{ __html: formatMessage(msg.text) }} className="markdown-content" />
@@ -407,9 +407,9 @@ export const NduChatWindow: React.FC = () => {
             </div>
           )}
 
-          {/* Terminal Input Line - Pure Glass */}
-          <div className="p-10 border-t border-white/[0.05] bg-transparent backdrop-blur-xl">
-            <div className="flex items-center gap-6 p-2 rounded-[28px] bg-white/[0.02] border border-white/[0.08] focus-within:border-cyan-500/50 focus-within:ring-8 focus-within:ring-cyan-500/5 transition-all duration-500 backdrop-blur-sm">
+          {/* Terminal Input Line - Zero Borders */}
+          <div className="p-10 border-none bg-transparent">
+            <div className="flex items-center gap-6 p-2 rounded-[28px] bg-transparent border-none transition-all duration-500">
               <input
                 type="text"
                 value={input}
