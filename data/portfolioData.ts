@@ -78,9 +78,9 @@ export const projects = [
   },
   {
     title: "AI Portfolio",
-    description: "The very portfolio you are viewing! A modern, interactive showcase built with React, Vite, and integrated with Ndu, the Gemini-powered AI assistant.",
-    tech: ["React", "TypeScript", "Vite", "TailwindCSS"],
-    primaryTech: "TypeScript",
+    description: "The very portfolio you are viewing! A modern, interactive showcase built with React, Vite, and integrated with Ndu, a local AI assistant running Llama 3.1 via WebLLM.",
+    tech: ["React", "TypeScript", "WebLLM", "Llama 3.1", "WebGPU"],
+    primaryTech: "WebLLM / React",
     github: "https://github.com/DavidGaso1/davidson-s-ai-portfolio",
     repoOwner: "DavidGaso1",
     repoName: "davidson-s-ai-portfolio",

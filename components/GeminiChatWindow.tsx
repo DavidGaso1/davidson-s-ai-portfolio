@@ -269,125 +269,137 @@ export const GeminiChatWindow: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-6 relative">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <h2 className="text-sm font-mono text-cyan-400 uppercase tracking-widest mb-4">Privacy-First AI</h2>
-        <h3 className="text-4xl md:text-5xl font-display font-bold mb-4">
-          Ask <span className="gradient-text">Ndu</span> Anything
+      {/* Tech-Savvy Header */}
+      <div className="text-center mb-16 relative">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-6 group cursor-default">
+          <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.8)]"></div>
+          <span className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-widest">Neural Core: Active</span>
+        </div>
+        
+        <h3 className="text-5xl md:text-7xl font-black mb-6 tracking-tighter">
+          PROJECT <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600">NDU-AI</span>
         </h3>
-        <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto">
-          Meet Ndu, my local AI assistant. Everything stays in your browser – no API keys, no data tracking.
+        
+        <p className="text-slate-500 font-mono text-xs uppercase tracking-[0.3em] max-w-2xl mx-auto">
+          // Private Local Inference // Llama 3.1 8B // WebGPU Accelerated
         </p>
       </div>
 
-      {/* Chat Container */}
-      <div className="max-w-3xl mx-auto relative">
-        <div className="rounded-3xl overflow-hidden bg-white/[0.02] border border-white/5 backdrop-blur-xl">
+      {/* Main Glass UI Container */}
+      <div className="max-w-4xl mx-auto relative group">
+        {/* Glow behind container */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-blue-600/20 to-purple-600/20 rounded-[40px] blur-3xl opacity-30 group-hover:opacity-60 transition duration-1000"></div>
+        
+        <div className="relative rounded-[40px] overflow-hidden bg-white/[0.01] border border-white/[0.08] backdrop-blur-[50px] shadow-2xl">
           
-          {/* WebGPU Support Banner */}
+          {/* Diagnostic Banner (Errors) */}
           {webGPUError && (
-            <div className="bg-red-500/10 border-b border-red-500/20 p-4 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
-              <p className="text-xs text-red-200 leading-relaxed">{webGPUError}</p>
+            <div className="bg-red-500/10 border-b border-red-500/20 p-4 flex items-center justify-center gap-3 animate-in slide-in-from-top duration-500">
+              <AlertCircle className="w-4 h-4 text-red-400" />
+              <p className="text-[10px] font-mono text-red-400 uppercase tracking-widest">{webGPUError}</p>
             </div>
           )}
 
-          {/* Model Loading Progress */}
+          {/* Boot Sequence (Loading) */}
           {isInitializing && (
-            <div className="p-6 border-b border-white/5 bg-cyan-500/5 animate-in fade-in slide-in-from-top-4 duration-500">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 text-cyan-400 animate-spin" />
-                  <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider">{loadStatus}</span>
+            <div className="p-10 border-b border-white/[0.05] bg-cyan-500/[0.02]">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <Loader2 className="w-6 h-6 text-cyan-400 animate-spin" />
+                    <div className="absolute inset-0 bg-cyan-400/30 blur-md rounded-full"></div>
+                  </div>
+                  <span className="text-xs font-mono text-cyan-400/80 uppercase tracking-[0.2em] animate-pulse">{loadStatus}</span>
                 </div>
-                <span className="text-xs font-mono text-cyan-400">{loadProgress}%</span>
+                <span className="text-lg font-mono font-black text-cyan-400">{loadProgress}%</span>
               </div>
-              <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+              <div className="h-0.5 bg-white/[0.05] rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-cyan-500 transition-all duration-300 ease-out shadow-[0_0_10px_rgba(6,182,212,0.5)]"
+                  className="h-full bg-gradient-to-r from-cyan-600 to-blue-500 transition-all duration-700 ease-in-out shadow-[0_0_15px_rgba(6,182,212,0.8)]"
                   style={{ width: `${loadProgress}%` }}
                 ></div>
               </div>
-              <p className="mt-4 text-[10px] text-slate-500 flex items-center gap-1.5 uppercase font-semibold">
-                <Info size={12} /> First-time setup: Downloading a lightweight model to your browser cache.
-              </p>
             </div>
           )}
           
-          {/* Welcome State or Chat Messages */}
+          {/* Interaction Buffer (Chat Window) */}
           {!hasStarted ? (
-            <div className="p-8 md:p-12 text-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-8 border border-cyan-500/20 shadow-[0_0_30px_-10px_rgba(6,182,212,0.3)]">
-                <Bot className="w-10 h-10 text-cyan-400" />
-              </div>
-              <h4 className="text-2xl font-display font-bold mb-3 text-white">Hello! I'm Ndu 👋</h4>
-              <p className="text-slate-400 mb-10 max-w-md mx-auto leading-relaxed">
-                I'm Davidson's AI portfolio assistant. I run locally on your device for absolute privacy and speed.
-              </p>
-              
-              <div className="space-y-4">
-                <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Suggested Topics:</p>
-                <div className="flex flex-wrap justify-center gap-3">
+            <div className="p-16 md:p-24 text-center relative overflow-hidden">
+              <div className="relative z-10">
+                <div className="w-24 h-24 rounded-3xl bg-cyan-500/5 flex items-center justify-center mx-auto mb-10 border border-cyan-500/20 shadow-2xl transform hover:rotate-6 transition-all duration-500 group-welcome">
+                  <Bot className="w-12 h-12 text-cyan-400" />
+                </div>
+                <h4 className="text-3xl font-black mb-4 text-white uppercase tracking-tight">System Ready</h4>
+                <p className="text-slate-400/70 mb-14 max-w-sm mx-auto font-mono text-xs uppercase tracking-widest leading-loose">
+                  Select a prompt to begin neural synchronization
+                </p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
                   {SUGGESTED_QUESTIONS.map((q, idx) => (
                     <button
                       key={idx}
                       onClick={() => handleSend(q)}
-                      className="px-5 py-2.5 backdrop-blur-md bg-white/[0.03] hover:bg-cyan-500/10 border border-white/10 hover:border-cyan-500/40 text-slate-300 hover:text-cyan-400 text-sm rounded-2xl transition-all duration-300 flex items-center gap-2 group"
+                      className="group p-6 bg-white/[0.02] hover:bg-cyan-500/5 border border-white/[0.05] hover:border-cyan-500/30 text-left rounded-[24px] transition-all duration-500"
                     >
-                      <Zap className="w-3.5 h-3.5 text-cyan-500 group-hover:scale-110 transition-transform" /> {q}
+                      <div className="text-[10px] font-mono text-cyan-500/40 uppercase mb-3 tracking-widest">Protocol 0{idx+1}</div>
+                      <span className="text-sm font-bold text-slate-300 group-hover:text-white transition-colors">{q}</span>
                     </button>
                   ))}
                 </div>
               </div>
+
+              {/* Distant light effects */}
+              <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-cyan-500/5 blur-[120px] -z-10 rounded-full animate-pulse"></div>
+              <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-purple-600/5 blur-[120px] -z-10 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
             </div>
           ) : (
             <div 
               ref={scrollRef} 
-              className="h-[500px] overflow-y-auto p-6 space-y-6 no-scrollbar custom-scrollbar"
+              className="h-[650px] overflow-y-auto p-10 space-y-10 no-scrollbar custom-scrollbar bg-black/10"
             >
               <style>{`
-                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+                .custom-scrollbar::-webkit-scrollbar { width: 3px; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.1); border-radius: 10px; }
               `}</style>
               {messages.map((msg, i) => (
-                <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                <div key={i} className={`flex gap-6 ${msg.role === 'user' ? 'flex-row-reverse' : ''} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
                   <div className="flex-shrink-0 mt-1">
                     {msg.role === 'bot' ? (
-                      <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/10 p-2 flex items-center justify-center border border-white/10 backdrop-blur-md shadow-lg">
-                        <Bot className="w-6 h-6 text-cyan-400" />
+                      <div className="w-12 h-12 rounded-2xl bg-white/[0.02] p-3 flex items-center justify-center border border-white/10 backdrop-blur-xl shadow-xl">
+                        <div className="absolute inset-0 bg-cyan-500/5 blur-md rounded-full"></div>
+                        <Bot className="w-8 h-8 text-cyan-400 relative z-10" />
                       </div>
                     ) : (
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-600 to-blue-700 flex items-center justify-center border border-cyan-500/20 shadow-lg">
-                        <User className="w-5 h-5 text-white" />
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-600 to-blue-700 flex items-center justify-center border border-white/20 shadow-xl">
+                        <User className="w-6 h-6 text-white" />
                       </div>
                     )}
                   </div>
                   
-                  <div className={`max-w-[85%] px-5 py-4 rounded-3xl text-[15px] leading-relaxed shadow-sm ${
+                  <div className={`max-w-[80%] px-8 py-6 rounded-[32px] text-[15px] leading-relaxed shadow-sm transition-all ${
                     msg.role === 'user' 
-                      ? 'bg-cyan-600/20 text-white rounded-tr-sm border border-cyan-500/20 backdrop-blur-sm' 
-                      : 'bg-white/[0.03] text-slate-200 border border-white/5 rounded-tl-sm backdrop-blur-sm'
+                      ? 'bg-white/[0.05] text-white rounded-tr-sm border border-white/10' 
+                      : 'bg-white/[0.01] text-slate-200 border border-white/[0.03] rounded-tl-sm'
                   }`}>
                     {msg.role === 'bot' ? (
-                      <div dangerouslySetInnerHTML={{ __html: formatMessage(msg.text) }} />
+                      <div dangerouslySetInnerHTML={{ __html: formatMessage(msg.text) }} className="markdown-content" />
                     ) : (
-                      msg.text
+                      <span className="font-medium tracking-wide">{msg.text}</span>
                     )}
                   </div>
                 </div>
               ))}
               
               {isLoading && (
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/10 p-2 flex items-center justify-center border border-white/10 backdrop-blur-md">
-                    <Bot className="w-6 h-6 text-cyan-400 animate-pulse" />
+                <div className="flex gap-6 animate-in fade-in duration-300">
+                  <div className="w-12 h-12 rounded-2xl bg-white/[0.02] p-3 flex items-center justify-center border border-white/10">
+                    <Loader2 className="w-5 h-5 text-cyan-400 animate-spin" />
                   </div>
-                  <div className="bg-white/[0.03] border border-white/5 px-5 py-4 rounded-3xl rounded-tl-sm backdrop-blur-sm">
-                    <div className="flex gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                  <div className="bg-white/[0.01] border border-white/[0.05] px-7 py-5 rounded-[32px] rounded-tl-sm backdrop-blur-sm">
+                    <div className="flex gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/60 animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/60 animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/60 animate-bounce" style={{ animationDelay: '300ms' }}></div>
                     </div>
                   </div>
                 </div>
@@ -395,9 +407,9 @@ export const GeminiChatWindow: React.FC = () => {
             </div>
           )}
 
-          {/* Input Area */}
-          <div className="p-6 border-t border-white/5 bg-black/20 backdrop-blur-2xl">
-            <div className="flex items-center gap-4">
+          {/* Terminal Input Line */}
+          <div className="p-10 border-t border-white/[0.05] bg-black/20">
+            <div className="flex items-center gap-6 p-2 rounded-[28px] bg-white/[0.02] border border-white/[0.08] focus-within:border-cyan-500/50 focus-within:ring-8 focus-within:ring-cyan-500/5 transition-all duration-500">
               <input
                 type="text"
                 value={input}
@@ -406,52 +418,51 @@ export const GeminiChatWindow: React.FC = () => {
                   resetInactivityTimer();
                 }}
                 onKeyPress={(e) => e.key === 'Enter' && !isLoading && !isInitializing && handleSend()}
-                placeholder={isInitializing ? "Initializing AI..." : "Ask me anything..."}
+                placeholder={isInitializing ? "TERMINAL_BUSY ..." : "EXECUTE_QUERY_ ..."}
                 disabled={isLoading || isInitializing || !!webGPUError}
-                className="flex-1 bg-white/[0.04] border border-white/10 focus:border-cyan-500/40 rounded-2xl py-4 px-6 text-white text-[15px] focus:outline-none focus:ring-4 focus:ring-cyan-500/10 placeholder:text-slate-600 transition-all disabled:opacity-50"
+                className="flex-1 bg-transparent border-none py-5 px-6 text-white text-[15px] font-mono tracking-wider focus:outline-none placeholder:text-slate-800 disabled:opacity-30 uppercase"
               />
-              <div className="flex gap-2">
+              <div className="flex gap-3 pr-2">
                 <button 
                   onClick={requestClearChat}
                   disabled={messages.length === 0}
-                  className="p-4 bg-white/[0.02] hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 text-slate-500 hover:text-red-400 rounded-2xl transition-all disabled:opacity-30 group relative"
+                  className="w-14 h-14 flex items-center justify-center bg-white/[0.02] hover:bg-red-500/10 border border-white/5 hover:border-red-500/20 text-slate-700 hover:text-red-400 rounded-2xl transition-all disabled:opacity-10 group"
+                  title="WIPE HISTORY"
                 >
-                  <Trash2 size={20} />
+                  <Trash2 size={20} className="transform group-hover:scale-90 transition-transform" />
                 </button>
                 <button 
                   onClick={() => handleSend()}
                   disabled={isLoading || isInitializing || !input.trim() || !!webGPUError}
-                  className="p-4 bg-gradient-to-r from-cyan-600 to-blue-700 hover:scale-105 active:scale-95 disabled:scale-100 disabled:opacity-50 disabled:grayscale transition-all text-white rounded-2xl shadow-lg shadow-cyan-500/20"
+                  className="w-14 h-14 flex items-center justify-center bg-gradient-to-br from-cyan-600 to-blue-700 hover:shadow-[0_0_30px_rgba(6,182,212,0.4)] disabled:opacity-20 disabled:grayscale transition-all text-white rounded-2xl group"
                 >
-                  <Send size={20} />
+                  <Send size={20} className="transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                 </button>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-3 mt-5">
-              <Zap className="w-3 h-3 text-cyan-400" />
-              <p className="text-[10px] text-slate-600 font-mono tracking-widest uppercase font-bold">
-                Running {SELECTED_MODEL} Locally via WebLLM
+            
+            <div className="flex items-center justify-center gap-4 mt-8">
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400 group-hover:rotate-12 transition-transform" />
+              <p className="text-[10px] text-slate-600 font-mono tracking-[0.4em] uppercase font-black">
+                Neural Proxy Optimized for Davidson.v1.0
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Confirmation Modals (Keep Existing Logic) */}
+      {/* Confirmation Overlays */}
       {showClearConfirm && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm rounded-3xl" onClick={() => setShowClearConfirm(false)}></div>
-          <div className="relative w-full max-w-sm bg-slate-900 border border-white/10 p-8 rounded-3xl shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center mb-6">
-                <Trash2 className="w-7 h-7 text-red-500" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">Clear Chat?</h3>
-              <p className="text-slate-400 text-sm mb-8 leading-relaxed">This will reset your local conversation with Ndu. Davidson's portfolio remains unchanged.</p>
-              <div className="flex gap-3 w-full">
-                <button onClick={() => setShowClearConfirm(false)} className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-slate-300 font-semibold transition-all">Cancel</button>
-                <button onClick={confirmClear} className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-2xl shadow-lg shadow-red-500/20 transition-all">Clear</button>
-              </div>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/80 backdrop-blur-3xl animate-in fade-in duration-300">
+          <div className="relative w-full max-w-sm bg-slate-900 border border-white/10 p-12 rounded-[40px] shadow-3xl text-center">
+            <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center mb-8 mx-auto">
+              <Trash2 className="w-8 h-8 text-red-500" />
+            </div>
+            <h3 className="text-2xl font-black text-white mb-4 uppercase tracking-tighter">Execute Purge?</h3>
+            <p className="text-slate-500 text-sm mb-12 font-mono uppercase tracking-widest leading-loose">Destroy all local conversational telemetry stored in the synaptic buffer?</p>
+            <div className="flex flex-col gap-3">
+              <button onClick={confirmClear} className="w-full py-5 bg-red-500 hover:bg-red-600 text-white font-black rounded-2xl shadow-xl transition-all transform active:scale-95 uppercase text-xs tracking-widest">Confirm Purge</button>
+              <button onClick={() => setShowClearConfirm(false)} className="w-full py-5 text-slate-600 hover:text-slate-300 font-mono text-[10px] uppercase tracking-[0.3em] transition-colors">Abort</button>
             </div>
           </div>
         </div>
