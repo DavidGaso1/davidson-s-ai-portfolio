@@ -310,7 +310,10 @@ export const NduChatWindow: React.FC = () => {
                     <Loader2 className="w-6 h-6 text-cyan-600 dark:text-cyan-400 animate-spin" />
                     <div className="absolute inset-0 bg-cyan-500/20 dark:bg-cyan-400/20 blur-md rounded-full"></div>
                   </div>
-                  <span className="text-xs font-mono text-cyan-700 dark:text-cyan-400/80 uppercase tracking-[0.2em] animate-pulse">{loadStatus}</span>
+                  <div className="flex flex-col">
+                    <span className="text-xs font-mono text-cyan-700 dark:text-cyan-400/80 uppercase tracking-[0.2em] animate-pulse">{loadStatus}</span>
+                    <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest mt-1">Downloading synaptic weights (~320MB)</span>
+                  </div>
                 </div>
                 <span className="text-lg font-mono font-black text-cyan-600 dark:text-cyan-400">{loadProgress}%</span>
               </div>
@@ -331,6 +334,9 @@ export const NduChatWindow: React.FC = () => {
                   <Bot className="w-8 h-8 text-cyan-600 dark:text-cyan-500" />
                 </div>
                 <h4 className="text-xl font-black mb-2 text-slate-950 dark:text-white uppercase tracking-tight">System Ready</h4>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/5 dark:bg-white/5 border border-slate-900/10 dark:border-white/10 mb-8">
+                  <span className="text-[10px] font-mono text-slate-600 dark:text-slate-400 uppercase tracking-widest">Model Size: ~320MB</span>
+                </div>
                 <p className="text-slate-600 dark:text-slate-400/70 mb-14 max-w-sm mx-auto font-mono text-xs uppercase tracking-widest leading-loose">
                   Select a prompt to begin neural synchronization
                 </p>
