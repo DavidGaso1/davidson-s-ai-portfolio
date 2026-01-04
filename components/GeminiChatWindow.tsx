@@ -7,7 +7,8 @@ import {
 } from '../data/portfolioData';
 
 // Model configuration
-const SELECTED_MODEL = "Llama-3.1-8B-Instruct-q4f16_1-MLC";
+// Selected Model for Local Inference - Optimizing for speed/size (1B vs 8B)
+const SELECTED_MODEL = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
 
 // Dynamically generated Portfolio Knowledge Base
 const PORTFOLIO_KNOWLEDGE = `
@@ -281,7 +282,7 @@ export const NduChatWindow: React.FC = () => {
         </h3>
         
         <p className="text-slate-500 font-mono text-xs uppercase tracking-[0.3em] max-w-2xl mx-auto">
-          // Private Local Inference // Llama 3.1 8B // WebGPU Accelerated
+          // Private Local Inference // Llama 3.2 1B // WebGPU Accelerated
         </p>
       </div>
 

@@ -67,7 +67,7 @@ export const projects = [
   {
     title: "Job-Agent",
     description: "An advanced AI-powered job application assistant that automates searches, tailors resumes, and assists in the application process.",
-    tech: ["Python", "Playwright", "Llama 3.1", "FastAPI"],
+    tech: ["Python", "Playwright", "Llama 3.2", "FastAPI"],
     primaryTech: "Python / AI",
     github: "https://github.com/DavidGaso1/Job-Agent",
     repoOwner: "DavidGaso1",
@@ -78,8 +78,8 @@ export const projects = [
   },
   {
     title: "AI Portfolio",
-    description: "The very portfolio you are viewing! A modern, interactive showcase built with React, Vite, and integrated with Ndu, a local AI assistant running Llama 3.1 via WebLLM.",
-    tech: ["React", "TypeScript", "WebLLM", "Llama 3.1", "WebGPU"],
+    description: "The very portfolio you are viewing! A modern, interactive showcase built with React, Vite, and integrated with Ndu, a local AI assistant running Llama 3.2 via WebLLM.",
+    tech: ["React", "TypeScript", "WebLLM", "Llama 3.2", "WebGPU"],
     primaryTech: "WebLLM / React",
     github: "https://github.com/DavidGaso1/davidson-s-ai-portfolio",
     repoOwner: "DavidGaso1",
@@ -114,8 +114,8 @@ export const projects = [
   },
   {
     title: "AI Assignment Gen",
-    description: "Intelligent tool that generates structured academic assignments with proper citations and professional formatting using Llama 3.1.",
-    tech: ["Llama 3.1", "HTML/CSS", "JavaScript"],
+    description: "Intelligent tool that generates structured academic assignments with proper citations and professional formatting using Llama 3.2.",
+    tech: ["Llama 3.2", "HTML/CSS", "JavaScript"],
     primaryTech: "GenAI",
     github: "https://github.com/DavidGaso1/AI-Assignment-Gen",
     repoOwner: "DavidGaso1",
