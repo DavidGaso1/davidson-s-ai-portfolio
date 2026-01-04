@@ -65,40 +65,100 @@ export const experiences = [
 
 export const projects = [
   {
-    title: "RAG System for ViZO Technologies",
-    description: "Intelligent document querying system with vector embeddings and semantic search.",
-    tech: ["Python", "LangChain", "OpenAI", "Vector DB"],
+    title: "Job-Agent",
+    description: "An advanced AI-powered job application assistant that automates searches, tailors resumes, and assists in the application process.",
+    tech: ["Python", "Playwright", "Gemini AI", "FastAPI"],
     primaryTech: "Python / AI",
-    github: "https://github.com/DavidGaso1/ViZO-RAG",
+    github: "https://github.com/DavidGaso1/Job-Agent",
+    repoOwner: "DavidGaso1",
+    repoName: "Job-Agent",
+    stars: 45,
+    forks: 12,
+    imageUrl: "/projects/job_agent_mock_ui.png"
+  },
+  {
+    title: "AI Portfolio",
+    description: "The very portfolio you are viewing! A modern, interactive showcase built with React, Vite, and integrated with Ndu, the Gemini-powered AI assistant.",
+    tech: ["React", "TypeScript", "Vite", "TailwindCSS"],
+    primaryTech: "TypeScript",
+    github: "https://github.com/DavidGaso1/davidson-s-ai-portfolio",
+    repoOwner: "DavidGaso1",
+    repoName: "davidson-s-ai-portfolio",
+    stars: 28,
+    forks: 5,
+    imageUrl: "/projects/portfolio_mock_ui.png"
+  },
+  {
+    title: "VIZO-RAG System",
+    description: "Enterprise-grade Retrieval-Augmented Generation system for ViZO Technologies, featuring vector embeddings and semantic document search.",
+    tech: ["Python", "LangChain", "OpenAI", "Supabase"],
+    primaryTech: "Python / AI",
+    github: "https://github.com/DavidGaso1/VIZO-RAG",
+    repoOwner: "DavidGaso1",
+    repoName: "VIZO-RAG",
     stars: 124,
-    forks: 35
+    forks: 35,
+    imageUrl: "/projects/vizo_rag_mock_ui.png"
   },
   {
-    title: "AI Assistant Automation Workflow",
-    description: "Comprehensive N8N workflow integrating Gemini, OpenAI, and Supabase for task management.",
-    tech: ["N8N", "Gemini", "OpenAI", "Supabase"],
-    primaryTech: "Automation",
-    github: "https://github.com/DavidGaso1/N8N-AI-Workflow",
+    title: "Bolt.diy",
+    description: "A collaborative platform to prompt, run, edit, and deploy full-stack web applications using any LLM, modified and enhanced with custom workflows.",
+    tech: ["TypeScript", "Next.JS", "LLM Integration", "Vite"],
+    primaryTech: "TypeScript",
+    github: "https://github.com/DavidGaso1/bolt.diy",
+    repoOwner: "DavidGaso1",
+    repoName: "bolt.diy",
+    stars: 210,
+    forks: 89,
+    imageUrl: "/projects/bolt_diy_mock_ui.png"
+  },
+  {
+    title: "N8n Automation Hub",
+    description: "A comprehensive collection of AI-driven automation workflows designed for academic research, task management, and API integrations.",
+    tech: ["n8n", "JSON", "Automation", "Workflows"],
+    primaryTech: "n8n Workflows",
+    github: "https://github.com/DavidGaso1/N8n-Automation",
+    repoOwner: "DavidGaso1",
+    repoName: "N8n-Automation",
     stars: 89,
-    forks: 12
+    forks: 12,
+    imageUrl: "/projects/n8n_workflow_mock_ui.png"
   },
   {
-    title: "AI Academic Assignment Generator",
-    description: "Automated essay generator providing structured content with academic citations.",
-    tech: ["Google Gemini", "HTML/CSS", "JSON"],
+    title: "AI Assignment Gen",
+    description: "Intelligent tool that generates structured academic assignments with proper citations and professional formatting using Google Gemini.",
+    tech: ["Google Gemini", "HTML/CSS", "JavaScript"],
     primaryTech: "GenAI",
     github: "https://github.com/DavidGaso1/AI-Assignment-Gen",
+    repoOwner: "DavidGaso1",
+    repoName: "AI-Assignment-Gen",
     stars: 256,
-    forks: 42
+    forks: 42,
+    imageUrl: "/projects/ai_assignment_gen_mock_ui.png"
   },
   {
-    title: "Data Cleaning with MySQL",
-    description: "Robust data preprocessing workflow designed for large-scale analytics pipelines.",
-    tech: ["MySQL", "SQL", "Data Analysis"],
+    title: "Data-DGI Analysis",
+    description: "Jupyter Notebook based data analysis project focused on large-scale insights and visualization for DGI Integrated Services.",
+    tech: ["Python", "Jupyter", "Pandas", "Matplotlib"],
+    primaryTech: "Data Analysis",
+    github: "https://github.com/DavidGaso1/-Data-DGI",
+    repoOwner: "DavidGaso1",
+    repoName: "-Data-DGI",
+    stars: 52,
+    forks: 7,
+    imageUrl: "/projects/data_dgi_mock_ui.png"
+  },
+  {
+    title: "SQL Data Cleaning",
+    description: "Detailed step-by-step SQL scripts and processes for cleaning and preprocessing complex datasets for analysis and visualization.",
+    tech: ["MySQL", "SQL", "Data Cleansing"],
     primaryTech: "Data Engineering",
-    github: "https://github.com/DavidGaso1/MySQL-Data-Cleaning",
+    github: "https://github.com/DavidGaso1/Data-Cleaning-WIth-Mysql",
+    repoOwner: "DavidGaso1",
+    repoName: "Data-Cleaning-WIth-Mysql",
     stars: 67,
-    forks: 8
+    forks: 8,
+    imageUrl: "/projects/mysql_data_cleaning_mock_ui.png"
   }
 ];
 
